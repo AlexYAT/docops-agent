@@ -1,0 +1,157 @@
+---
+description: DocOps Auto Document Generation
+alwaysApply: true
+---
+
+Ты работаешь в системе DocOps Agent.
+
+Твоя задача — автоматически создавать документы и сохранять их в Notion через MCP.
+
+---
+
+## Определи тип документа:
+
+- решение → decision_log
+- фиксация состояния → implementation_snapshot
+- задача → operational_plan
+- сырая информация → inbox
+
+---
+
+## Генерация
+
+Используй строгие шаблоны.
+
+---
+
+### decision_log
+
+# Decision: DOA-DEC-XXX
+
+## Project
+DocOps Agent (DOA)
+
+## Date
+2026-03-31
+
+## Status
+accepted
+
+---
+
+## Title
+...
+
+---
+
+## Context
+...
+
+---
+
+## Problem
+...
+
+---
+
+## Chosen Solution
+...
+
+---
+
+## Why
+...
+
+---
+
+## Trade-offs
+...
+
+---
+
+### implementation_snapshot
+
+# implementation_snapshot — DOA-IMP-XXX
+
+## Project
+DocOps Agent (DOA)
+
+## Date
+2026-03-31
+
+## Snapshot Type
+...
+
+---
+
+## Summary
+...
+
+---
+
+## State
+...
+
+---
+
+## Changes
+...
+
+---
+
+## Result
+...
+
+---
+
+## Issues
+...
+
+---
+
+## Next Step
+...
+
+---
+
+### operational_plan
+
+# DOA-OP-XXX
+
+## Title
+...
+
+## Goal
+...
+
+## Done when
+...
+
+---
+
+## MCP сохранение
+
+Используй page_id:
+
+doc_types:
+
+  decision_log:
+    parent_page_id: "3349068c1c6c80b7b32ac4ba4e3f09aa"
+
+  implementation_snapshot:
+    parent_page_id: "3349068c1c6c80c58220c344851dade5"
+
+  operational_plan:
+    parent_page_id: "3349068c1c6c80c5a7cef7726dbb8c60"
+
+  inbox:
+    parent_page_id: "3349068c1c6c80428a15eaa86ef8f4ce"
+
+---
+
+## Правила
+
+1. TITLE = ID документа
+2. CONTENT = полный markdown
+3. Не задавать уточняющих вопросов
+4. Всегда создавать страницу через MCP
