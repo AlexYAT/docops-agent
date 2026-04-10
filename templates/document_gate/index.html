@@ -8,14 +8,45 @@
 <body>
     <h1>Document Gate UI</h1>
     <p>Minimal local dry-run only UI for dogfooding.</p>
+    <p>Runs existing gate CLI in dry-run mode.</p>
 
-    <form method="get" action="#">
-        <button type="button" disabled>Run Gate (coming next)</button>
+    <form method="post" action="/run">
+        <button type="submit">Run Gate (dry-run)</button>
     </form>
 
     <section>
         <h2>Result</h2>
         <p>Status: {{ status }}</p>
+        {% if error %}
+        <p>Error: {{ error }}</p>
+        {% endif %}
+        {% if gate_status %}
+        <p>Gate status: {{ gate_status }}</p>
+        {% endif %}
+        {% if report_path %}
+        <p>Report path: {{ report_path }}</p>
+        {% endif %}
+        {% if counts %}
+        <h3>Counts</h3>
+        <ul>
+            <li>Total: {{ counts.get("total", 0) }}</li>
+            <li>Error: {{ counts.get("error", 0) }}</li>
+            <li>Warn: {{ counts.get("warn", 0) }}</li>
+            <li>Info: {{ counts.get("info", 0) }}</li>
+        </ul>
+        {% endif %}
+
+        {% if findings %}
+        <h3>Findings (first 10)</h3>
+        <ul>
+            {% for f in findings[:10] %}
+            <li>
+                [{{ f.get("severity", "n/a") }}] {{ f.get("type", "unknown") }}
+                {% if f.get("file") %} - {{ f.get("file") }}{% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
     </section>
 </body>
 </html>
