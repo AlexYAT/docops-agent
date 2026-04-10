@@ -13,6 +13,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+OVERLAY_REGISTRY_PATH = ROOT / "docs" / "rules" / "overlay_registry.json"
 
 STRICT_ID_RE = re.compile(r"^DOA-(IDEA|ARCH|DEC|LT|MT|OP|IMP|AUD|OTH|RUL)-(\d+)$")
 LINK_RE = re.compile(r"\[([^\]]*)\]\(([^)]+)\)")
@@ -31,6 +32,80 @@ FAMILY_TO_DOC_TYPE = {
 }
 
 STATUS_ENUM = frozenset({"draft", "review", "accepted", "obsolete"})
+
+
+def load_overlay_registry(path: Path) -> dict:
+    if not path.is_file():
+        return {
+            "loaded": False,
+            "source": str(path.relative_to(ROOT)),
+            "mappings": [],
+            "parent_overrides": [],
+            "aliases": [],
+        }
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {
+            "loaded": False,
+            "source": str(path.relative_to(ROOT)),
+            "mappings": [],
+            "parent_overrides": [],
+            "aliases": [],
+        }
+    return {
+        "loaded": True,
+        "source": str(path.relative_to(ROOT)),
+        "mappings": data.get("mappings") or [],
+        "parent_overrides": data.get("parent_overrides") or [],
+        "aliases": data.get("aliases") or [],
+    }
+
+
+def apply_overlay_resolution_markers(
+    canonical_violations: list[dict], overlay: dict
+) -> tuple[int, int]:
+    source = overlay.get("source", "docs/rules/overlay_registry.json")
+
+    duplicate_overlay_ids = {
+        m.get("legacy_id")
+        for m in overlay.get("mappings", [])
+        if m.get("type") == "duplicate_id" and m.get("status") == "active"
+    }
+
+    parent_override_index = {
+        (po.get("child"), po.get("original_parent")): po
+        for po in overlay.get("parent_overrides", [])
+        if po.get("child") and po.get("original_parent")
+    }
+
+    resolved = 0
+    unresolved = 0
+
+    for item in canonical_violations:
+        item["resolution_status"] = "unresolved"
+
+        if item.get("category") == "duplicate_id_registry":
+            dup_id = item.get("detail")
+            if dup_id in duplicate_overlay_ids:
+                item["resolution_status"] = "resolved_via_overlay"
+                item["overlay_source"] = source
+                item["overlay_rule_type"] = "mapping:duplicate_id"
+
+        elif item.get("category") == "unresolved_parent":
+            child = item.get("doc_id")
+            original_parent = item.get("detail")
+            if (child, original_parent) in parent_override_index:
+                item["resolution_status"] = "resolved_via_overlay"
+                item["overlay_source"] = source
+                item["overlay_rule_type"] = "parent_override"
+
+        if item["resolution_status"] == "resolved_via_overlay":
+            resolved += 1
+        else:
+            unresolved += 1
+
+    return resolved, unresolved
 
 
 def parse_metadata(content: str) -> dict[str, str] | None:
@@ -136,6 +211,7 @@ def check_links(path: Path, content: str, issues: list[dict]) -> None:
 
 def main() -> int:
     targets = collect_targets(ROOT)
+    overlay = load_overlay_registry(OVERLAY_REGISTRY_PATH)
     # Pass 1: known IDs
     id_to_files: dict[str, list[str]] = {}
     for path in targets:
@@ -323,6 +399,7 @@ def main() -> int:
                         "mode": "canonical",
                         "category": "unresolved_parent",
                         "file": str(rel),
+                        "doc_id": doc_id,
                         "detail": pl,
                     }
                 )
@@ -373,6 +450,10 @@ def main() -> int:
             }
         )
 
+    resolved_count, unresolved_count = apply_overlay_resolution_markers(
+        canonical_violations, overlay
+    )
+
     report = {
         "validator": {
             "name": "doa_link_id_validator",
@@ -388,9 +469,15 @@ def main() -> int:
         "counts": {
             "canonical_violations": len(canonical_violations),
             "legacy_findings": len(legacy_findings),
+            "canonical_resolved_via_overlay": resolved_count,
+            "canonical_unresolved_violations": unresolved_count,
         },
         "canonical_violations": canonical_violations,
         "legacy_findings": legacy_findings,
+        "overlay": {
+            "loaded": overlay.get("loaded", False),
+            "source": overlay.get("source", "docs/rules/overlay_registry.json"),
+        },
         "top_categories": [],
     }
 
