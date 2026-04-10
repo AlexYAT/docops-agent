@@ -1,15 +1,15 @@
 {
   "schema": "doa-gate-report/1",
-  "generated_at_utc": "2026-04-10T07:25:19Z",
+  "generated_at_utc": "2026-04-10T08:48:18Z",
   "repo_root": "D:\\Work\\DocOp\\Project",
   "gate_status": "REJECT",
   "engine_version": "0.1.0",
   "policy_version": "doa-gate-policy/1",
   "counts": {
-    "total": 52,
+    "total": 54,
     "error": 7,
     "warn": 45,
-    "info": 0
+    "info": 2
   },
   "findings": [
     {
@@ -17,49 +17,76 @@
       "severity": "error",
       "file": "docs\\architecture_draft\\DOA-ARCH-003_TZ_final_consolidated.md",
       "details": "DOA-DOC-IDEA",
-      "engine_mode": "canonical"
+      "engine_mode": "canonical",
+      "resolution_status": "unresolved"
     },
     {
       "type": "noncanonical_doc_type_key",
       "severity": "error",
       "file": "docs\\decision_log\\DOA-DEC-027_tz_import_conflict_resolution.md",
       "details": "Uses Type: instead of Doc type:",
-      "engine_mode": "canonical"
+      "engine_mode": "canonical",
+      "resolution_status": "unresolved"
     },
     {
       "type": "status_not_in_enum",
       "severity": "error",
       "file": "docs\\decision_log\\DOA-DEC-027_tz_import_conflict_resolution.md",
       "details": "approved",
-      "engine_mode": "canonical"
+      "engine_mode": "canonical",
+      "resolution_status": "unresolved"
     },
     {
       "type": "missing_parent_field",
       "severity": "error",
       "file": "docs\\decision_log\\DOA-DEC-027_tz_import_conflict_resolution.md",
       "details": null,
-      "engine_mode": "canonical"
+      "engine_mode": "canonical",
+      "resolution_status": "unresolved"
     },
     {
       "type": "unresolved_parent",
-      "severity": "error",
+      "severity": "info",
       "file": "docs\\idea_to_mvp\\DOA-IDEA-002_docops_document_gate.md",
       "details": "DOA-OP-007",
-      "engine_mode": "canonical"
+      "engine_mode": "canonical",
+      "resolution_status": "resolved_via_overlay",
+      "overlay_source": "docs\\rules\\overlay_registry.json",
+      "overlay_rule_type": "parent_override"
     },
     {
       "type": "invalid_replaces_format",
       "severity": "error",
       "file": "docs\\operational_plan\\DOA-OP-001_v2_mvp_implementation_bootstrap.md",
       "details": "DOA-OP-001 (draft)",
-      "engine_mode": "canonical"
+      "engine_mode": "canonical",
+      "resolution_status": "unresolved"
+    },
+    {
+      "type": "status_not_in_enum",
+      "severity": "error",
+      "file": "docs\\operational_plan\\DOA-OP-022_document_system_hardening_cycle.md",
+      "details": "planned",
+      "engine_mode": "canonical",
+      "resolution_status": "unresolved"
+    },
+    {
+      "type": "status_not_in_enum",
+      "severity": "error",
+      "file": "docs\\operational_plan\\DOA-OP-023_overlay_registry_mvp_implementation.md",
+      "details": "planned",
+      "engine_mode": "canonical",
+      "resolution_status": "unresolved"
     },
     {
       "type": "duplicate_id_registry",
-      "severity": "error",
+      "severity": "info",
       "file": "docs\\implementation_snapshot\\DOA-IMP-014_validator_hardening_baseline_pre_impl.md; docs\\implementation_snapshot\\DOA-IMP-014_validator_v02_planning_baseline.md",
       "details": "DOA-IMP-014; files: docs\\implementation_snapshot\\DOA-IMP-014_validator_hardening_baseline_pre_impl.md, docs\\implementation_snapshot\\DOA-IMP-014_validator_v02_planning_baseline.md",
-      "engine_mode": "canonical"
+      "engine_mode": "canonical",
+      "resolution_status": "resolved_via_overlay",
+      "overlay_source": "docs\\rules\\overlay_registry.json",
+      "overlay_rule_type": "mapping:duplicate_id"
     },
     {
       "type": "legacy_no_canonical_metadata",
@@ -390,7 +417,7 @@
         "version": "0.1.0",
         "schema": "doa-validator-report/1"
       },
-      "generated_at_utc": "2026-04-10T07:25:19Z",
+      "generated_at_utc": "2026-04-10T08:48:18Z",
       "root": "D:\\Work\\DocOp\\Project",
       "scope": {
         "globs": [
@@ -398,47 +425,73 @@
           "README.md",
           "WORKFLOW.md"
         ],
-        "files_scanned": 89
+        "files_scanned": 96
       },
       "counts": {
-        "canonical_violations": 7,
-        "legacy_findings": 45
+        "canonical_violations": 9,
+        "legacy_findings": 45,
+        "canonical_resolved_via_overlay": 2,
+        "canonical_unresolved_violations": 7
       },
       "canonical_violations": [
         {
           "mode": "canonical",
           "category": "unresolved_parent",
           "file": "docs\\architecture_draft\\DOA-ARCH-003_TZ_final_consolidated.md",
-          "detail": "DOA-DOC-IDEA"
+          "doc_id": "DOA-ARCH-003",
+          "detail": "DOA-DOC-IDEA",
+          "resolution_status": "unresolved"
         },
         {
           "mode": "canonical",
           "category": "noncanonical_doc_type_key",
           "file": "docs\\decision_log\\DOA-DEC-027_tz_import_conflict_resolution.md",
-          "detail": "Uses Type: instead of Doc type:"
+          "detail": "Uses Type: instead of Doc type:",
+          "resolution_status": "unresolved"
         },
         {
           "mode": "canonical",
           "category": "status_not_in_enum",
           "file": "docs\\decision_log\\DOA-DEC-027_tz_import_conflict_resolution.md",
-          "detail": "approved"
+          "detail": "approved",
+          "resolution_status": "unresolved"
         },
         {
           "mode": "canonical",
           "category": "missing_parent_field",
-          "file": "docs\\decision_log\\DOA-DEC-027_tz_import_conflict_resolution.md"
+          "file": "docs\\decision_log\\DOA-DEC-027_tz_import_conflict_resolution.md",
+          "resolution_status": "unresolved"
         },
         {
           "mode": "canonical",
           "category": "unresolved_parent",
           "file": "docs\\idea_to_mvp\\DOA-IDEA-002_docops_document_gate.md",
-          "detail": "DOA-OP-007"
+          "doc_id": "DOA-IDEA-002",
+          "detail": "DOA-OP-007",
+          "resolution_status": "resolved_via_overlay",
+          "overlay_source": "docs\\rules\\overlay_registry.json",
+          "overlay_rule_type": "parent_override"
         },
         {
           "mode": "canonical",
           "category": "invalid_replaces_format",
           "file": "docs\\operational_plan\\DOA-OP-001_v2_mvp_implementation_bootstrap.md",
-          "detail": "DOA-OP-001 (draft)"
+          "detail": "DOA-OP-001 (draft)",
+          "resolution_status": "unresolved"
+        },
+        {
+          "mode": "canonical",
+          "category": "status_not_in_enum",
+          "file": "docs\\operational_plan\\DOA-OP-022_document_system_hardening_cycle.md",
+          "detail": "planned",
+          "resolution_status": "unresolved"
+        },
+        {
+          "mode": "canonical",
+          "category": "status_not_in_enum",
+          "file": "docs\\operational_plan\\DOA-OP-023_overlay_registry_mvp_implementation.md",
+          "detail": "planned",
+          "resolution_status": "unresolved"
         },
         {
           "mode": "canonical",
@@ -447,7 +500,10 @@
           "files": [
             "docs\\implementation_snapshot\\DOA-IMP-014_validator_hardening_baseline_pre_impl.md",
             "docs\\implementation_snapshot\\DOA-IMP-014_validator_v02_planning_baseline.md"
-          ]
+          ],
+          "resolution_status": "resolved_via_overlay",
+          "overlay_source": "docs\\rules\\overlay_registry.json",
+          "overlay_rule_type": "mapping:duplicate_id"
         }
       ],
       "legacy_findings": [
@@ -722,10 +778,18 @@
           "detail": "README/WORKFLOW not required to carry ## Metadata"
         }
       ],
+      "overlay": {
+        "loaded": true,
+        "source": "docs\\rules\\overlay_registry.json"
+      },
       "top_categories": [
         {
           "category": "legacy_no_canonical_metadata",
           "count": 43
+        },
+        {
+          "category": "status_not_in_enum",
+          "count": 3
         },
         {
           "category": "unresolved_parent",
@@ -737,10 +801,6 @@
         },
         {
           "category": "noncanonical_doc_type_key",
-          "count": 1
-        },
-        {
-          "category": "status_not_in_enum",
           "count": 1
         },
         {
