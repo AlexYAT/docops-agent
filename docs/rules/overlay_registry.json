@@ -1,0 +1,26 @@
+{
+  "schema": "doa-overlay/1",
+  "version": "1",
+  "generated_at": "2026-04-10T15:20:00Z",
+  "mappings": [
+    {
+      "type": "duplicate_id",
+      "legacy_id": "DOA-IMP-014",
+      "canonical_id": "DOA-IMP-014",
+      "resolution": "prefer_latest",
+      "reason": "duplicate implementation snapshot",
+      "source": "manual",
+      "status": "active"
+    }
+  ],
+  "parent_overrides": [
+    {
+      "child": "DOA-IDEA-002",
+      "original_parent": "DOA-OP-007",
+      "resolved_parent": null,
+      "reason": "parent document missing in repository",
+      "status": "accepted_missing"
+    }
+  ],
+  "aliases": []
+}
