@@ -69,7 +69,7 @@ def normalize_findings(report: dict[str, Any]) -> list[dict[str, Any]]:
     Flatten canonical_violations and legacy_findings into a uniform list.
 
     Each item: type (category), severity from engine or None, file, details,
-    engine_mode (canonical | legacy | root_link).
+    engine_mode (canonical | legacy | root_link), plus optional overlay markers.
     """
     out: list[dict[str, Any]] = []
 
@@ -99,6 +99,9 @@ def normalize_findings(report: dict[str, Any]) -> list[dict[str, Any]]:
                 "file": str(f) if f is not None else None,
                 "details": details,
                 "engine_mode": engine_mode,
+                "resolution_status": item.get("resolution_status"),
+                "overlay_source": item.get("overlay_source"),
+                "overlay_rule_type": item.get("overlay_rule_type"),
             }
         )
 
@@ -112,7 +115,8 @@ def normalize_findings(report: dict[str, Any]) -> list[dict[str, Any]]:
 
 def assign_severity(finding: dict[str, Any], policy: dict[str, Any] | None) -> str:
     """
-    Resolve final severity for one finding: engine value, policy override, or defaults.
+    Resolve final severity for one finding: overlay handling, engine value,
+    policy override, or defaults.
 
     Default mapping when engine omits severity (DOA-DEC-032 aligned):
     - mode canonical -> error
@@ -125,6 +129,11 @@ def assign_severity(finding: dict[str, Any], policy: dict[str, Any] | None) -> s
     - version: str (reported as policy_version)
     - category_overrides: { "<category>": "error"|"warn"|"info" }
     """
+    # Overlay-aware MVP rule (OP-023 T05):
+    # findings already resolved via overlay are downgraded to informational.
+    if finding.get("resolution_status") == "resolved_via_overlay":
+        return "info"
+
     raw = finding.get("severity")
     if raw is not None:
         s = str(raw).lower()
@@ -292,6 +301,12 @@ def main(argv: list[str] | None = None) -> int:
         }
         if f.get("severity") is not None:
             entry["engine_severity"] = f["severity"]
+        if f.get("resolution_status") is not None:
+            entry["resolution_status"] = f["resolution_status"]
+        if f.get("overlay_source") is not None:
+            entry["overlay_source"] = f["overlay_source"]
+        if f.get("overlay_rule_type") is not None:
+            entry["overlay_rule_type"] = f["overlay_rule_type"]
         findings.append(entry)
 
     gate_status = compute_gate_status(findings)
