@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
-DocOps Document Gate MVP (DOA-OP-020) — CLI and validator adapter (T01/T02).
+DocOps Document Gate MVP (DOA-OP-020) — CLI, validator adapter, policy (T01–T04).
 
 Does not implement document checks; delegates to scripts/doa_link_id_validator.py.
+Semantic autofix is not implemented.
 """
 from __future__ import annotations
 
@@ -10,8 +11,13 @@ import argparse
 import json
 import subprocess
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+GATE_REPORT_SCHEMA = "doa-gate-report/1"
+DEFAULT_POLICY_VERSION = "doa-gate-policy/1"
+VALID_SEVERITIES = frozenset({"error", "warn", "info"})
 
 
 def run_validator(root_path: str | Path) -> dict[str, Any]:
@@ -36,6 +42,12 @@ def run_validator(root_path: str | Path) -> dict[str, Any]:
         encoding="utf-8",
     )
 
+    if proc.returncode != 0:
+        raise RuntimeError(
+            f"Validator exited with code {proc.returncode}; "
+            f"stderr: {proc.stderr.strip() or '(empty)'}"
+        )
+
     raw = proc.stdout.strip()
     if not raw:
         raise RuntimeError(
@@ -56,15 +68,18 @@ def normalize_findings(report: dict[str, Any]) -> list[dict[str, Any]]:
     """
     Flatten canonical_violations and legacy_findings into a uniform list.
 
-    Each item: type, severity (None if absent), file, details.
+    Each item: type (category), severity from engine or None, file, details,
+    engine_mode (canonical | legacy | root_link).
     """
     out: list[dict[str, Any]] = []
 
-    def _one(bucket: str, item: dict[str, Any]) -> None:
-        category = item.get("category") or bucket
+    def _one(default_mode: str, item: dict[str, Any]) -> None:
+        category = item.get("category") or default_mode
         sev = item.get("severity")
         if sev is not None:
             sev = str(sev).lower()
+
+        engine_mode = item.get("mode") or default_mode
 
         f = item.get("file")
         if f is None and item.get("files"):
@@ -83,20 +98,127 @@ def normalize_findings(report: dict[str, Any]) -> list[dict[str, Any]]:
                 "severity": sev,
                 "file": str(f) if f is not None else None,
                 "details": details,
+                "engine_mode": engine_mode,
             }
         )
 
     for item in report.get("canonical_violations") or []:
-        _one("canonical_violation", item)
+        _one("canonical", item)
     for item in report.get("legacy_findings") or []:
-        _one("legacy_finding", item)
+        _one("legacy", item)
 
     return out
 
 
+def assign_severity(finding: dict[str, Any], policy: dict[str, Any] | None) -> str:
+    """
+    Resolve final severity for one finding: engine value, policy override, or defaults.
+
+    Default mapping when engine omits severity (DOA-DEC-032 aligned):
+    - mode canonical -> error
+    - mode legacy -> warn
+    - mode root_link:
+        - category broken_markdown_link -> warn
+        - other root_link (e.g. markdown_link_escape, informational notes) -> info
+
+    Optional policy JSON keys:
+    - version: str (reported as policy_version)
+    - category_overrides: { "<category>": "error"|"warn"|"info" }
+    """
+    raw = finding.get("severity")
+    if raw is not None:
+        s = str(raw).lower()
+        if s in VALID_SEVERITIES:
+            return s
+
+    pol = policy or {}
+    overrides = pol.get("category_overrides") or {}
+    cat = finding.get("type") or ""
+    if cat in overrides:
+        o = str(overrides[cat]).lower()
+        if o in VALID_SEVERITIES:
+            return o
+
+    mode = finding.get("engine_mode") or "legacy"
+    if mode == "canonical":
+        return "error"
+    if mode == "root_link":
+        if cat == "broken_markdown_link":
+            return "warn"
+        return "info"
+    return "warn"
+
+
+def compute_gate_status(findings: list[dict[str, Any]]) -> str:
+    """
+    Aggregate severities into gate status (DOA-DEC-032):
+    any error -> REJECT; else any warn -> ACCEPT_WITH_WARNINGS; else ACCEPT.
+    """
+    sevs = [f.get("severity") for f in findings]
+    if any(s == "error" for s in sevs):
+        return "REJECT"
+    if any(s == "warn" for s in sevs):
+        return "ACCEPT_WITH_WARNINGS"
+    return "ACCEPT"
+
+
+def _count_severities(findings: list[dict[str, Any]]) -> dict[str, int]:
+    c = {"error": 0, "warn": 0, "info": 0}
+    for f in findings:
+        s = f.get("severity")
+        if s in c:
+            c[s] += 1
+    c["total"] = len(findings)
+    return c
+
+
+def build_gate_report(
+    *,
+    repo_root: Path,
+    engine_report: dict[str, Any],
+    findings: list[dict[str, Any]],
+    gate_status: str,
+    policy: dict[str, Any] | None,
+    dry_run: bool,
+    autofix: bool,
+    policy_path: str | None,
+) -> dict[str, Any]:
+    eng = engine_report.get("validator") or {}
+    engine_version = str(eng.get("version") or "unknown")
+    pol = policy or {}
+    policy_version = str(pol.get("version") or DEFAULT_POLICY_VERSION)
+
+    counts = _count_severities(findings)
+
+    return {
+        "schema": GATE_REPORT_SCHEMA,
+        "generated_at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "repo_root": str(repo_root.resolve()),
+        "gate_status": gate_status,
+        "engine_version": engine_version,
+        "policy_version": policy_version,
+        "counts": {
+            "total": counts["total"],
+            "error": counts["error"],
+            "warn": counts["warn"],
+            "info": counts["info"],
+        },
+        "findings": findings,
+        "gate_run": {
+            "dry_run": dry_run,
+            "autofix": autofix,
+            "policy_path": policy_path,
+            "policy_loaded": policy_path is not None,
+        },
+        "raw": {
+            "engine_report": engine_report,
+        },
+    }
+
+
 def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p = argparse.ArgumentParser(
-        description="DocOps Document Gate — validator adapter (MVP T01/T02)."
+        description="DocOps Document Gate — validator engine + policy (MVP T01–T04)."
     )
     p.add_argument(
         "--root",
@@ -118,7 +240,7 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--no-dry-run",
         dest="dry_run",
         action="store_false",
-        help="Disable dry-run (for future phases; no file mutations in T01/T02).",
+        help="Disable dry-run (no file mutations in current MVP).",
     )
     p.set_defaults(dry_run=True)
 
@@ -126,13 +248,13 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--autofix",
         action="store_true",
         default=False,
-        help="Enable mechanical autofix (opt-in; not implemented in T01/T02).",
+        help="Opt-in mechanical autofix (not implemented).",
     )
 
     p.add_argument(
         "--policy",
         default=None,
-        help="Optional path to policy file (JSON); loaded if present, passed through in output.",
+        help="Optional path to policy JSON (category_overrides, version).",
     )
 
     return p.parse_args(argv)
@@ -152,38 +274,50 @@ def main(argv: list[str] | None = None) -> int:
     args = _parse_args(argv)
     root = Path(args.root).resolve()
 
-    policy_data = None
-    if args.policy:
-        policy_data = _load_policy(args.policy)
+    policy_data = _load_policy(args.policy)
 
     engine_report = run_validator(root)
 
     normalized = normalize_findings(engine_report)
+
+    findings: list[dict[str, Any]] = []
+    for f in normalized:
+        assigned = assign_severity(f, policy_data)
+        entry: dict[str, Any] = {
+            "type": f["type"],
+            "severity": assigned,
+            "file": f["file"],
+            "details": f["details"],
+            "engine_mode": f.get("engine_mode"),
+        }
+        if f.get("severity") is not None:
+            entry["engine_severity"] = f["severity"]
+        findings.append(entry)
+
+    gate_status = compute_gate_status(findings)
+
+    report = build_gate_report(
+        repo_root=root,
+        engine_report=engine_report,
+        findings=findings,
+        gate_status=gate_status,
+        policy=policy_data,
+        dry_run=bool(args.dry_run),
+        autofix=bool(args.autofix),
+        policy_path=args.policy,
+    )
 
     out_path = Path(args.out)
     if not out_path.is_absolute():
         out_path = root / out_path
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
-    payload = {
-        "gate": {
-            "dry_run": args.dry_run,
-            "autofix": bool(args.autofix),
-            "policy_path": args.policy,
-            "policy_loaded": policy_data is not None,
-        },
-        "engine_report": engine_report,
-        "normalized_findings": normalized,
-    }
-    if policy_data is not None:
-        payload["policy"] = policy_data
-
     out_path.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+        json.dumps(report, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
 
-    print(f"Wrote {out_path}", file=sys.stderr)
+    print(f"Wrote {out_path} gate_status={gate_status}", file=sys.stderr)
     return 0
 
 
