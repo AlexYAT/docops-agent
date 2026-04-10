@@ -23,6 +23,8 @@ def index(request: Request) -> HTMLResponse:
         "gate_status": None,
         "counts": None,
         "findings": [],
+        "has_run": False,
+        "dry_run_only": True,
         "report_path": str(DEFAULT_REPORT_PATH),
         "error": None,
     }
@@ -32,12 +34,15 @@ def index(request: Request) -> HTMLResponse:
 @app.post("/run", response_class=HTMLResponse)
 def run_gate(request: Request) -> HTMLResponse:
     # Thin shell only: call existing gate script and read generated report.
+    # Guardrail: UI supports dry-run only (no autofix, no git operations).
     context = {
         "request": request,
         "status": "Run failed",
         "gate_status": None,
         "counts": None,
         "findings": [],
+        "has_run": True,
+        "dry_run_only": True,
         "report_path": str(DEFAULT_REPORT_PATH),
         "error": None,
     }

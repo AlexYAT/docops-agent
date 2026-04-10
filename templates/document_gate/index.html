@@ -9,6 +9,7 @@
     <h1>Document Gate UI</h1>
     <p>Minimal local dry-run only UI for dogfooding.</p>
     <p>Runs existing gate CLI in dry-run mode.</p>
+    <p>This UI does not support autofix or git operations.</p>
 
     <form method="post" action="/run">
         <button type="submit">Run Gate (dry-run)</button>
@@ -18,7 +19,7 @@
         <h2>Result</h2>
         <p>Status: {{ status }}</p>
         {% if error %}
-        <p>Error: {{ error }}</p>
+        <p><strong>Error:</strong> {{ error }}</p>
         {% endif %}
         {% if gate_status %}
         <p>Gate status: {{ gate_status }}</p>
@@ -46,6 +47,8 @@
             </li>
             {% endfor %}
         </ul>
+        {% elif has_run and not error %}
+        <p>No findings returned by report.</p>
         {% endif %}
     </section>
 </body>
