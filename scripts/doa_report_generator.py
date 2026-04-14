@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-MVP Report Generator (DOA-OP-021 T01–T07 + DOA-OP-024 human-readable layer).
+MVP Report Generator (DOA-OP-021 T01–T07 + DOA-OP-024 + DOA-OP-025 RU strings).
 
 Loads validator + gate JSON, builds deterministic markdown with mandatory
-(source: …) tags, RU section titles, run record + delta vs previous report,
+(source: …) tags, RU section titles and RU static copy, run record + delta,
 provenance (incl. optional git HEAD), forbidden-string checks, structural DoD.
 No NLP / LLM / policy interpretation.
 """
@@ -19,7 +19,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-GENERATOR_VERSION = "doa-report-generator/0.2.0-mvp"
+GENERATOR_VERSION = "doa-report-generator/0.3.0-mvp"
+
+# H1 title (RU static string, DOA-OP-025); must match validate_generated_report.
+REPORT_TITLE = "# Вывод генератора отчётов"
 
 # T04 / T05: explicit source markers (template-only).
 SRC_GATE = "(source: gate JSON)"
@@ -28,6 +31,7 @@ SRC_GATE_VAL = "(source: gate JSON; validator JSON)"
 SRC_ARCH019 = "(source: DOA-ARCH-019)"
 SRC_OP021 = "(source: DOA-OP-021)"
 SRC_OP024 = "(source: DOA-OP-024)"
+SRC_OP025 = "(source: DOA-OP-025)"
 SRC_GEN = "(source: generator internal)"
 SRC_CLI = "(source: CLI arguments)"
 SRC_GIT = "(source: subprocess git rev-parse HEAD)"
@@ -275,7 +279,9 @@ def _fmt_delta_gate_count(key: str, old_c: dict[str, Any], new_c: dict[str, Any]
     if oi is None or ni is None:
         return None
     d = ni - oi
-    return f"- `gate {key} count`: `{oi}` -> `{ni}`, delta = `{d}` {SRC_GATE}"
+    return (
+        f"- счётчик **gate** `counts` / `{key}`: было `{oi}`, стало `{ni}`, разница `{d}` {SRC_GATE}"
+    )
 
 
 def build_delta_lines(
@@ -310,7 +316,7 @@ def build_delta_lines(
 
     out: list[str] = []
     if old_gs != new_gs:
-        out.append(f"- `gate_status`: `{old_gs}` -> `{new_gs}` {SRC_GATE}")
+        out.append(f"- `gate_status`: было `{old_gs}`, стало `{new_gs}` {SRC_GATE}")
 
     for key in ("error", "warn", "info"):
         ln = _fmt_delta_gate_count(key, old_gc, new_gc)
@@ -321,7 +327,7 @@ def build_delta_lines(
     new_js = json.dumps(new_vc, sort_keys=True, ensure_ascii=False)
     if old_js != new_js:
         out.append(
-            f"- `validator counts` (JSON): изменилось с `{old_js}` на `{new_js}` {SRC_VAL}"
+            f"- `validator counts` (JSON): было `{old_js}`, стало `{new_js}` {SRC_VAL}"
         )
 
     if not out:
@@ -336,9 +342,9 @@ def build_recorded_lines(
 ) -> list[str]:
     """T02: facts of current run only."""
     return [
-        f"- выполнена загрузка validator input `{validator_path.name}` {SRC_VAL}",
-        f"- выполнена загрузка gate input `{gate_path.name}` {SRC_GATE}",
-        f"- сформирован отчёт `{out_path.name}` {SRC_GEN}",
+        f"- выполнена загрузка входного файла validator `{validator_path.name}` {SRC_VAL}",
+        f"- выполнена загрузка входного файла gate `{gate_path.name}` {SRC_GATE}",
+        f"- сформирован файл отчёта `{out_path.name}` {SRC_GEN}",
     ]
 
 
@@ -357,22 +363,22 @@ def build_markdown(
 ) -> str:
     """Build full report (RU headings, new sections)."""
     lines: list[str] = []
-    lines.append("# Report Generator Output")
+    lines.append(REPORT_TITLE)
     lines.append("")
     lines.append(SEC_SUMMARY)
     lines.append("")
     gs = gate_p.get("gate_status")
     gc = gate_p.get("counts") or {}
     vc = val_p.get("counts") or {}
-    lines.append(f"- **gate_status** (from gate JSON): `{gs}` {SRC_GATE}")
+    lines.append(f"- **gate_status** (данные из gate JSON): `{gs}` {SRC_GATE}")
     lines.append(
-        f"- **gate counts** (from gate JSON): `{json.dumps(gc, sort_keys=True, ensure_ascii=False)}` {SRC_GATE}"
+        f"- **gate counts** (данные из gate JSON): `{json.dumps(gc, sort_keys=True, ensure_ascii=False)}` {SRC_GATE}"
     )
     lines.append(
-        f"- **validator counts** (from validator JSON): `{json.dumps(vc, sort_keys=True, ensure_ascii=False)}` {SRC_VAL}"
+        f"- **validator counts** (данные из validator JSON): `{json.dumps(vc, sort_keys=True, ensure_ascii=False)}` {SRC_VAL}"
     )
     lines.append(
-        f"- **note**: values above are copied from JSON inputs; this file is not a canonical DocOps document. {SRC_ARCH019}"
+        f"- **примечание**: значения выше скопированы из входных JSON; файл не является каноническим документом DocOps. {SRC_ARCH019}"
     )
     lines.append("")
     lines.append(SEC_RECORDED)
@@ -383,11 +389,11 @@ def build_markdown(
     lines.append("")
     if not doc_type_ok:
         lines.append(
-            f"- doc_type aggregation **unavailable** from current inputs (no `doc_type` field on finding rows). {SRC_GATE_VAL}"
+            f"- агрегация **doc_type** **недоступна**: во входах нет поля `doc_type` в строках находок. {SRC_GATE_VAL}"
         )
     else:
         lines.append(
-            f"- Aggregated counts where `doc_type` was present on finding rows. {SRC_GATE_VAL}"
+            f"- агрегированные счётчики по строкам, где было поле `doc_type`. {SRC_GATE_VAL}"
         )
         for k in sorted(doc_type_counts.keys()):
             lines.append(f"- `{k}`: {doc_type_counts[k]} {SRC_GATE_VAL}")
@@ -398,23 +404,26 @@ def build_markdown(
     gw = gc.get("warn")
     gi = gc.get("info")
     lines.append(
-        f"- From **gate** `counts`: error={ge}, warn={gw}, info={gi} (numeric fields from input JSON). {SRC_GATE}"
+        f"- из **gate** `counts`: error={ge}, warn={gw}, info={gi} (числовые поля из входного JSON). {SRC_GATE}"
     )
     if isinstance(vc, dict) and vc:
         lines.append(
-            f"- From **validator** `counts`: `{json.dumps(vc, sort_keys=True, ensure_ascii=False)}`. {SRC_VAL}"
+            f"- из **validator** `counts`: `{json.dumps(vc, sort_keys=True, ensure_ascii=False)}`. {SRC_VAL}"
         )
     lines.append("")
     lines.append(SEC_NEXT)
     lines.append("")
     lines.append(
-        f"- Re-run validator and gate to refresh inputs, then regenerate this report. {SRC_OP021}"
+        f"- повторно запустить validator и gate, обновить входы и сгенерировать отчёт заново. {SRC_OP021}"
     )
     lines.append(
-        f"- Continue operational tasks per `DOA-OP-021` outside this generator. {SRC_OP021}"
+        f"- продолжить операционные задачи по `DOA-OP-021` вне этого генератора. {SRC_OP021}"
     )
     lines.append(
-        f"- Человеко-читаемый deterministic слой по `DOA-OP-024` / `DOA-DEC-043`. {SRC_OP024}"
+        f"- человеко-читаемый deterministic слой по `DOA-OP-024` / `DOA-DEC-043`. {SRC_OP024}"
+    )
+    lines.append(
+        f"- полная русификация статических строк по `DOA-OP-025` / `DOA-DEC-044`. {SRC_OP025}"
     )
     lines.append("")
     lines.append(SEC_DELTA)
@@ -423,37 +432,37 @@ def build_markdown(
     lines.append("")
     lines.append(SEC_PROVENANCE)
     lines.append("")
-    lines.append(f"- **report generated at (UTC)**: `{generated_ts}` {SRC_GEN}")
-    lines.append(f"- **validator input path**: `{validator_path.as_posix()}` {SRC_CLI}")
-    lines.append(f"- **gate input path**: `{gate_path.as_posix()}` {SRC_CLI}")
-    lines.append(f"- **generator version**: `{GENERATOR_VERSION}` {SRC_GEN}")
+    lines.append(f"- **время генерации отчёта (UTC)**: `{generated_ts}` {SRC_GEN}")
+    lines.append(f"- **путь входного файла validator**: `{validator_path.as_posix()}` {SRC_CLI}")
+    lines.append(f"- **путь входного файла gate**: `{gate_path.as_posix()}` {SRC_CLI}")
+    lines.append(f"- **версия генератора**: `{GENERATOR_VERSION}` {SRC_GEN}")
     lines.append(f"- **source_commit**: `{source_commit}` {source_commit_src}")
     ev = gate_p.get("engine_version")
     pv = gate_p.get("policy_version")
     if ev is not None:
-        lines.append(f"- **gate engine_version** (from gate JSON): `{ev}` {SRC_GATE}")
+        lines.append(f"- **gate.engine_version** (из gate JSON): `{ev}` {SRC_GATE}")
     if pv is not None:
-        lines.append(f"- **gate policy_version** (from gate JSON): `{pv}` {SRC_GATE}")
+        lines.append(f"- **gate.policy_version** (из gate JSON): `{pv}` {SRC_GATE}")
     vm = val_p.get("validator_meta") or {}
     if isinstance(vm, dict) and vm.get("version") is not None:
         lines.append(
-            f"- **validator engine version** (from validator JSON): `{vm.get('version')}` {SRC_VAL}"
+            f"- **validator** версия движка (из validator JSON): `{vm.get('version')}` {SRC_VAL}"
         )
     if gate_p.get("generated_at_utc") is not None:
         lines.append(
-            f"- **gate.generated_at_utc** (from gate JSON): `{gate_p.get('generated_at_utc')}` {SRC_GATE}"
+            f"- **gate.generated_at_utc** (из gate JSON): `{gate_p.get('generated_at_utc')}` {SRC_GATE}"
         )
     if val_p.get("generated_at_utc") is not None:
         lines.append(
-            f"- **validator.generated_at_utc** (from validator JSON): `{val_p.get('generated_at_utc')}` {SRC_VAL}"
+            f"- **validator.generated_at_utc** (из validator JSON): `{val_p.get('generated_at_utc')}` {SRC_VAL}"
         )
     if gate_p.get("repo_root") is not None:
         lines.append(
-            f"- **gate.repo_root** (from gate JSON): `{gate_p.get('repo_root')}` {SRC_GATE}"
+            f"- **gate.repo_root** (из gate JSON): `{gate_p.get('repo_root')}` {SRC_GATE}"
         )
     if val_p.get("root") is not None:
         lines.append(
-            f"- **validator.root** (from validator JSON): `{val_p.get('root')}` {SRC_VAL}"
+            f"- **validator.root** (из validator JSON): `{val_p.get('root')}` {SRC_VAL}"
         )
     lines.append("")
     return "\n".join(lines)
@@ -503,8 +512,8 @@ def validate_generated_report(body: str) -> list[str]:
     """Structural DoD (DOA-DEC-039 subset) + RU headings (DOA-OP-024)."""
     errs: list[str] = []
     first_line = next((ln for ln in body.splitlines() if ln.strip()), "")
-    if first_line.strip() != "# Report Generator Output":
-        errs.append("DoD: first non-empty line must be '# Report Generator Output'")
+    if first_line.strip() != REPORT_TITLE:
+        errs.append(f"DoD: first non-empty line must be '{REPORT_TITLE}'")
     for h in REQUIRED_SECTION_HEADINGS:
         if h not in body:
             errs.append(f"DoD: missing required section heading: {h}")
@@ -528,7 +537,7 @@ def validate_generated_report(body: str) -> list[str]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="DOA MVP report generator (T01–T07 + OP-024 human-readable layer)."
+        description="DOA MVP report generator (T01–T07 + OP-024/025 human-readable RU layer)."
     )
     parser.add_argument("--validator", type=Path, required=True, help="Path to validator JSON report")
     parser.add_argument("--gate", type=Path, required=True, help="Path to gate JSON report")
