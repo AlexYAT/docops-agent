@@ -11,7 +11,7 @@
 
 - выполнена загрузка validator input `doa_link_id_validator_run_001.json` (source: validator JSON)
 - выполнена загрузка gate input `doa_document_gate_run_001.json` (source: gate JSON)
-- сформирован отчёт `report_generator_run_001.md` (source: generator internal)
+- сформирован отчёт `report_generator_run_002.md` (source: generator internal)
 
 ## состояние по типам документов
 
@@ -30,11 +30,11 @@
 
 ## что изменилось
 
-- предыдущий запуск не найден (source: unavailable)
+- изменений по доступным полям не обнаружено (source: generator internal)
 
 ## происхождение данных
 
-- **report generated at (UTC)**: `2026-04-14T03:56:40Z` (source: generator internal)
+- **report generated at (UTC)**: `2026-04-14T03:56:48Z` (source: generator internal)
 - **validator input path**: `D:/Work/DocOp/Project/reports/doa_link_id_validator_run_001.json` (source: CLI arguments)
 - **gate input path**: `D:/Work/DocOp/Project/reports/doa_document_gate_run_001.json` (source: CLI arguments)
 - **generator version**: `doa-report-generator/0.2.0-mvp` (source: generator internal)
