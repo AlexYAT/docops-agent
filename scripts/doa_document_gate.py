@@ -19,7 +19,10 @@ GATE_REPORT_SCHEMA = "doa-gate-report/1+dual_mode_mvp"
 DEFAULT_POLICY_VERSION = "doa-gate-policy/1"
 VALID_SEVERITIES = frozenset({"error", "warn", "info"})
 CLOSURE_CONTRACT_VERSION = "closure/1"
-closure_semantics_enabled = False
+closure_semantics_enabled = True
+M1_SUCCESSOR_ACTIVATION_CATEGORIES = frozenset(
+    {"noncanonical_doc_type_key", "invalid_replaces_format"}
+)
 
 
 def run_validator(root_path: str | Path) -> dict[str, Any]:
@@ -170,6 +173,43 @@ def assign_severity(finding: dict[str, Any], policy: dict[str, Any] | None) -> s
             return "warn"
         return "info"
     return "warn"
+
+
+def apply_closure_activation(
+    finding: dict[str, Any], assigned_severity: str
+) -> tuple[str, str, str, Any]:
+    """
+    T07 activation (category-scoped MVP):
+    only M1 categories can be interpreted as resolved via successor activation.
+    """
+    status = str(finding.get("resolution_status") or "none")
+    source = str(finding.get("resolution_source") or "none")
+    trace_reference = finding.get("trace_reference")
+    contract = str(
+        finding.get("closure_contract_version") or CLOSURE_CONTRACT_VERSION
+    )
+    category = str(finding.get("type") or "")
+
+    if not closure_semantics_enabled:
+        return assigned_severity, status, source, trace_reference
+
+    if category not in M1_SUCCESSOR_ACTIVATION_CATEGORIES:
+        return assigned_severity, status, source, trace_reference
+
+    if (
+        status == "candidate_successor"
+        and source == "successor"
+        and trace_reference
+        and contract == CLOSURE_CONTRACT_VERSION
+    ):
+        return (
+            "info",
+            "resolved_via_successor_activation",
+            "successor",
+            trace_reference,
+        )
+
+    return assigned_severity, status, source, trace_reference
 
 
 def compute_gate_status_controlled(findings: list[dict[str, Any]]) -> str:
@@ -355,6 +395,12 @@ def main(argv: list[str] | None = None) -> int:
     findings: list[dict[str, Any]] = []
     for f in normalized:
         assigned = assign_severity(f, policy_data)
+        (
+            assigned,
+            resolved_status,
+            resolved_source,
+            resolved_trace_reference,
+        ) = apply_closure_activation(f, assigned)
         entry: dict[str, Any] = {
             "type": f["type"],
             "severity": assigned,
@@ -364,9 +410,9 @@ def main(argv: list[str] | None = None) -> int:
         }
         if f.get("severity") is not None:
             entry["engine_severity"] = f["severity"]
-        entry["resolution_status"] = f.get("resolution_status", "none")
-        entry["resolution_source"] = f.get("resolution_source", "none")
-        entry["trace_reference"] = f.get("trace_reference")
+        entry["resolution_status"] = resolved_status
+        entry["resolution_source"] = resolved_source
+        entry["trace_reference"] = resolved_trace_reference
         entry["closure_contract_version"] = f.get(
             "closure_contract_version", CLOSURE_CONTRACT_VERSION
         )
