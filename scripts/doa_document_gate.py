@@ -15,7 +15,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-GATE_REPORT_SCHEMA = "doa-gate-report/1"
+GATE_REPORT_SCHEMA = "doa-gate-report/1+dual_mode_mvp"
 DEFAULT_POLICY_VERSION = "doa-gate-policy/1"
 VALID_SEVERITIES = frozenset({"error", "warn", "info"})
 
@@ -99,6 +99,8 @@ def normalize_findings(report: dict[str, Any]) -> list[dict[str, Any]]:
                 "file": str(f) if f is not None else None,
                 "details": details,
                 "engine_mode": engine_mode,
+                "source_zone": item.get("source_zone"),
+                "target_zone": item.get("target_zone"),
                 "resolution_status": item.get("resolution_status"),
                 "overlay_source": item.get("overlay_source"),
                 "overlay_rule_type": item.get("overlay_rule_type"),
@@ -109,6 +111,8 @@ def normalize_findings(report: dict[str, Any]) -> list[dict[str, Any]]:
         _one("canonical", item)
     for item in report.get("legacy_findings") or []:
         _one("legacy", item)
+    for item in report.get("cross_zone_violations") or []:
+        _one("cross_zone", item)
 
     return out
 
@@ -140,9 +144,12 @@ def assign_severity(finding: dict[str, Any], policy: dict[str, Any] | None) -> s
         if s in VALID_SEVERITIES:
             return s
 
+    cat = finding.get("type") or ""
+    if cat == "controlled_reference_to_legacy":
+        return "error"
+
     pol = policy or {}
     overrides = pol.get("category_overrides") or {}
-    cat = finding.get("type") or ""
     if cat in overrides:
         o = str(overrides[cat]).lower()
         if o in VALID_SEVERITIES:
@@ -156,6 +163,27 @@ def assign_severity(finding: dict[str, Any], policy: dict[str, Any] | None) -> s
             return "warn"
         return "info"
     return "warn"
+
+
+def compute_gate_status_controlled(findings: list[dict[str, Any]]) -> str:
+    """
+    Verdict for post-boundary work health (DOA-ARCH-021 MVP):
+    only controlled + boundary source zones, plus all cross-zone violations.
+    Legacy-only and root findings do not affect this verdict by default.
+    """
+    relevant: list[dict[str, Any]] = []
+    for f in findings:
+        t = f.get("type")
+        em = f.get("engine_mode")
+        if t == "controlled_reference_to_legacy" or em == "cross_zone":
+            relevant.append(f)
+            continue
+        sz = f.get("source_zone")
+        if sz in ("controlled", "boundary"):
+            relevant.append(f)
+    if not relevant:
+        return "ACCEPT"
+    return compute_gate_status(relevant)
 
 
 def compute_gate_status(findings: list[dict[str, Any]]) -> str:
@@ -181,12 +209,36 @@ def _count_severities(findings: list[dict[str, Any]]) -> dict[str, int]:
     return c
 
 
+def _dual_mode_counts(findings: list[dict[str, Any]]) -> dict[str, int]:
+    legacy_c = controlled_c = cross_c = other = 0
+    for f in findings:
+        t = f.get("type")
+        em = f.get("engine_mode")
+        if t == "controlled_reference_to_legacy" or em == "cross_zone":
+            cross_c += 1
+            continue
+        sz = f.get("source_zone")
+        if sz == "legacy":
+            legacy_c += 1
+        elif sz in ("controlled", "boundary"):
+            controlled_c += 1
+        else:
+            other += 1
+    return {
+        "legacy_findings_count": legacy_c,
+        "controlled_findings_count": controlled_c,
+        "cross_zone_violations_count": cross_c,
+        "other_zone_findings_count": other,
+    }
+
+
 def build_gate_report(
     *,
     repo_root: Path,
     engine_report: dict[str, Any],
     findings: list[dict[str, Any]],
     gate_status: str,
+    gate_status_controlled: str,
     policy: dict[str, Any] | None,
     dry_run: bool,
     autofix: bool,
@@ -198,12 +250,14 @@ def build_gate_report(
     policy_version = str(pol.get("version") or DEFAULT_POLICY_VERSION)
 
     counts = _count_severities(findings)
+    dm = _dual_mode_counts(findings)
 
     return {
         "schema": GATE_REPORT_SCHEMA,
         "generated_at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "repo_root": str(repo_root.resolve()),
         "gate_status": gate_status,
+        "gate_status_controlled": gate_status_controlled,
         "engine_version": engine_version,
         "policy_version": policy_version,
         "counts": {
@@ -212,6 +266,7 @@ def build_gate_report(
             "warn": counts["warn"],
             "info": counts["info"],
         },
+        "dual_mode_counts": dm,
         "findings": findings,
         "gate_run": {
             "dry_run": dry_run,
@@ -307,15 +362,21 @@ def main(argv: list[str] | None = None) -> int:
             entry["overlay_source"] = f["overlay_source"]
         if f.get("overlay_rule_type") is not None:
             entry["overlay_rule_type"] = f["overlay_rule_type"]
+        if f.get("source_zone") is not None:
+            entry["source_zone"] = f["source_zone"]
+        if f.get("target_zone") is not None:
+            entry["target_zone"] = f["target_zone"]
         findings.append(entry)
 
     gate_status = compute_gate_status(findings)
+    gate_status_controlled = compute_gate_status_controlled(findings)
 
     report = build_gate_report(
         repo_root=root,
         engine_report=engine_report,
         findings=findings,
         gate_status=gate_status,
+        gate_status_controlled=gate_status_controlled,
         policy=policy_data,
         dry_run=bool(args.dry_run),
         autofix=bool(args.autofix),
@@ -332,7 +393,11 @@ def main(argv: list[str] | None = None) -> int:
         encoding="utf-8",
     )
 
-    print(f"Wrote {out_path} gate_status={gate_status}", file=sys.stderr)
+    print(
+        f"Wrote {out_path} gate_status={gate_status} "
+        f"gate_status_controlled={gate_status_controlled}",
+        file=sys.stderr,
+    )
     return 0
 
 

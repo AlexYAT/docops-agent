@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import json
 import re
+import subprocess
 import sys
 from collections import Counter
 from datetime import datetime, timezone
@@ -15,7 +16,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 OVERLAY_REGISTRY_PATH = ROOT / "docs" / "rules" / "overlay_registry.json"
 
-STRICT_ID_RE = re.compile(r"^DOA-(IDEA|ARCH|DEC|LT|MT|OP|IMP|AUD|OTH|RUL)-(\d+)$")
+# MVP dual-mode boundary (DOA-DEC-047): Git commit that introduced DOA-FSN-001.
+# Replace only when a new fixed_snapshot epoch is policy-approved.
+BOUNDARY_COMMIT = "d94a7d7b9751309ffbd55dd71614e25071c08c8a"
+BOUNDARY_FILE_POSIX = "docs/fixed_snapshot/DOA-FSN-001_boundary_pre_controlled_phase.md"
+
+STRICT_ID_RE = re.compile(r"^DOA-(IDEA|ARCH|DEC|LT|MT|OP|IMP|AUD|OTH|RUL|FSN)-(\d+)$")
 LINK_RE = re.compile(r"\[([^\]]*)\]\(([^)]+)\)")
 
 FAMILY_TO_DOC_TYPE = {
@@ -29,9 +35,145 @@ FAMILY_TO_DOC_TYPE = {
     "AUD": "audit_check",
     "OTH": "other",
     "RUL": "rules",
+    "FSN": "fixed_snapshot",
 }
 
 STATUS_ENUM = frozenset({"draft", "review", "accepted", "obsolete"})
+
+
+def _git_first_commit_introducing(root: Path, rel_posix: str) -> str | None:
+    """Earliest commit that introduced path (diff-filter=A). Best-effort; None on failure."""
+    proc = subprocess.run(
+        [
+            "git",
+            "log",
+            "--diff-filter=A",
+            "--format=%H",
+            "--reverse",
+            "--",
+            rel_posix,
+        ],
+        cwd=str(root),
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        timeout=120,
+    )
+    if proc.returncode != 0:
+        return None
+    lines = [ln.strip() for ln in proc.stdout.splitlines() if ln.strip()]
+    return lines[0] if lines else None
+
+
+def _git_is_strict_ancestor(root: Path, ancestor: str, descendant: str) -> bool:
+    if ancestor == descendant:
+        return False
+    proc = subprocess.run(
+        ["git", "merge-base", "--is-ancestor", ancestor, descendant],
+        cwd=str(root),
+        capture_output=True,
+        timeout=60,
+    )
+    return proc.returncode == 0
+
+
+def classify_path_zone(root: Path, rel_posix: str, first_commit: str | None) -> str:
+    """
+    legacy | boundary | controlled | unknown (DOA-DEC-047 + DOA-ARCH-021).
+    """
+    if first_commit is None:
+        return "unknown"
+    if rel_posix == BOUNDARY_FILE_POSIX and first_commit == BOUNDARY_COMMIT:
+        return "boundary"
+    if first_commit == BOUNDARY_COMMIT and rel_posix != BOUNDARY_FILE_POSIX:
+        return "controlled"
+    if _git_is_strict_ancestor(root, first_commit, BOUNDARY_COMMIT):
+        return "legacy"
+    if _git_is_strict_ancestor(root, BOUNDARY_COMMIT, first_commit):
+        return "controlled"
+    return "unknown"
+
+
+def build_docs_path_zones(root: Path, targets: list[Path]) -> dict[str, str]:
+    """Map docs-relative posix path -> zone."""
+    zones: dict[str, str] = {}
+    for path in targets:
+        rel = path.relative_to(root)
+        if rel.parts[0] != "docs":
+            continue
+        rp = rel.as_posix()
+        fc = _git_first_commit_introducing(root, rp)
+        zones[rp] = classify_path_zone(root, rp, fc)
+    return zones
+
+
+def check_controlled_to_legacy_links(
+    root: Path,
+    source_path: Path,
+    content: str,
+    source_zone: str,
+    path_zones: dict[str, str],
+    cross_zone: list[dict],
+) -> None:
+    if source_zone != "controlled":
+        return
+    rel_parent = source_path.parent
+    srel = source_path.relative_to(root).as_posix()
+    for _text, target in LINK_RE.findall(content):
+        target = target.strip()
+        if target.startswith(("http://", "https://", "mailto:", "#")):
+            continue
+        if "://" in target:
+            continue
+        clean = target.split("#", 1)[0]
+        if not clean:
+            continue
+        cand = (rel_parent / clean).resolve()
+        try:
+            trel = cand.relative_to(root.resolve()).as_posix()
+        except ValueError:
+            continue
+        if not cand.is_file():
+            continue
+        if not trel.endswith(".md") or not trel.startswith("docs/"):
+            continue
+        tz = path_zones.get(trel, "unknown")
+        if tz == "legacy":
+            cross_zone.append(
+                {
+                    "severity": "error",
+                    "mode": "cross_zone",
+                    "category": "controlled_reference_to_legacy",
+                    "file": srel,
+                    "target": trel,
+                    "detail": f"controlled file links to legacy target {trel}",
+                    "source_zone": "controlled",
+                    "target_zone": "legacy",
+                }
+            )
+
+
+def _posix_rel_key(path_str: str) -> str:
+    """Normalize Windows paths to POSIX keys for zone map lookup."""
+    return path_str.replace("\\", "/")
+
+
+def _attach_source_zone(item: dict, path_zones: dict[str, str]) -> None:
+    if item.get("source_zone"):
+        return
+    f = item.get("file")
+    if f and isinstance(f, str):
+        fp = _posix_rel_key(f)
+        if fp.startswith("docs/"):
+            item["source_zone"] = path_zones.get(fp, "unknown")
+        else:
+            item["source_zone"] = "root"
+        return
+    files = item.get("files")
+    if files and isinstance(files, (list, tuple)) and files:
+        first = _posix_rel_key(str(files[0]))
+        if first.startswith("docs/"):
+            item["source_zone"] = path_zones.get(first, "unknown")
 
 
 def load_overlay_registry(path: Path) -> dict:
@@ -133,7 +275,7 @@ def file_doc_type(rel: Path) -> str | None:
 
 
 def stem_base_id(name: str) -> str | None:
-    m = re.match(r"^(DOA-(?:IDEA|ARCH|DEC|LT|MT|OP|IMP|AUD|OTH|RUL)-\d+)", name)
+    m = re.match(r"^(DOA-(?:IDEA|ARCH|DEC|LT|MT|OP|IMP|AUD|OTH|RUL|FSN)-\d+)", name)
     return m.group(1) if m else None
 
 
@@ -240,6 +382,9 @@ def main() -> int:
 
     known_ids = set(id_to_files.keys())
 
+    path_zones = build_docs_path_zones(ROOT, targets)
+    cross_zone_violations: list[dict] = []
+
     canonical_violations: list[dict] = []
     legacy_findings: list[dict] = []
 
@@ -260,6 +405,11 @@ def main() -> int:
                 }
             )
             continue
+
+        sz = path_zones.get(rel.as_posix(), "unknown")
+        check_controlled_to_legacy_links(
+            ROOT, path, text, sz, path_zones, cross_zone_violations
+        )
 
         canonical = is_canonical(meta)
 
@@ -454,10 +604,17 @@ def main() -> int:
         canonical_violations, overlay
     )
 
+    for item in canonical_violations:
+        _attach_source_zone(item, path_zones)
+    for item in legacy_findings:
+        _attach_source_zone(item, path_zones)
+
+    zone_counts = Counter(path_zones.values())
+
     report = {
         "validator": {
             "name": "doa_link_id_validator",
-            "version": "0.1.0",
+            "version": "0.2.0",
             "schema": "doa-validator-report/1",
         },
         "generated_at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -471,7 +628,16 @@ def main() -> int:
             "legacy_findings": len(legacy_findings),
             "canonical_resolved_via_overlay": resolved_count,
             "canonical_unresolved_violations": unresolved_count,
+            "cross_zone_violations": len(cross_zone_violations),
         },
+        "dual_mode": {
+            "boundary_commit": BOUNDARY_COMMIT,
+            "boundary_file": BOUNDARY_FILE_POSIX,
+            "docs_path_zone_counts": dict(zone_counts),
+            "note": "Zones from Git first-commit vs boundary (DOA-DEC-047). "
+            "Authoritative runs require full Git history (non-shallow clone).",
+        },
+        "cross_zone_violations": cross_zone_violations,
         "canonical_violations": canonical_violations,
         "legacy_findings": legacy_findings,
         "overlay": {
