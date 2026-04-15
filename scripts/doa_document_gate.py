@@ -18,6 +18,8 @@ from typing import Any
 GATE_REPORT_SCHEMA = "doa-gate-report/1+dual_mode_mvp"
 DEFAULT_POLICY_VERSION = "doa-gate-policy/1"
 VALID_SEVERITIES = frozenset({"error", "warn", "info"})
+CLOSURE_CONTRACT_VERSION = "closure/1"
+closure_semantics_enabled = False
 
 
 def run_validator(root_path: str | Path) -> dict[str, Any]:
@@ -101,7 +103,12 @@ def normalize_findings(report: dict[str, Any]) -> list[dict[str, Any]]:
                 "engine_mode": engine_mode,
                 "source_zone": item.get("source_zone"),
                 "target_zone": item.get("target_zone"),
-                "resolution_status": item.get("resolution_status"),
+                "resolution_status": item.get("resolution_status", "none"),
+                "resolution_source": item.get("resolution_source", "none"),
+                "trace_reference": item.get("trace_reference"),
+                "closure_contract_version": item.get(
+                    "closure_contract_version", CLOSURE_CONTRACT_VERSION
+                ),
                 "overlay_source": item.get("overlay_source"),
                 "overlay_rule_type": item.get("overlay_rule_type"),
             }
@@ -256,6 +263,7 @@ def build_gate_report(
         "schema": GATE_REPORT_SCHEMA,
         "generated_at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "repo_root": str(repo_root.resolve()),
+        "closure_contract_version": CLOSURE_CONTRACT_VERSION,
         "gate_status": gate_status,
         "gate_status_controlled": gate_status_controlled,
         "engine_version": engine_version,
@@ -356,8 +364,12 @@ def main(argv: list[str] | None = None) -> int:
         }
         if f.get("severity") is not None:
             entry["engine_severity"] = f["severity"]
-        if f.get("resolution_status") is not None:
-            entry["resolution_status"] = f["resolution_status"]
+        entry["resolution_status"] = f.get("resolution_status", "none")
+        entry["resolution_source"] = f.get("resolution_source", "none")
+        entry["trace_reference"] = f.get("trace_reference")
+        entry["closure_contract_version"] = f.get(
+            "closure_contract_version", CLOSURE_CONTRACT_VERSION
+        )
         if f.get("overlay_source") is not None:
             entry["overlay_source"] = f["overlay_source"]
         if f.get("overlay_rule_type") is not None:

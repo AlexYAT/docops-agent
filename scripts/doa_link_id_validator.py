@@ -15,6 +15,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 OVERLAY_REGISTRY_PATH = ROOT / "docs" / "rules" / "overlay_registry.json"
+CLOSURE_CONTRACT_VERSION = "closure/1"
+closure_semantics_enabled = False
 
 # MVP dual-mode boundary (DOA-DEC-047): Git commit that introduced DOA-FSN-001.
 # Replace only when a new fixed_snapshot epoch is policy-approved.
@@ -225,22 +227,29 @@ def apply_overlay_resolution_markers(
     unresolved = 0
 
     for item in canonical_violations:
-        item["resolution_status"] = "unresolved"
+        item["resolution_status"] = "none"
+        item["resolution_source"] = "none"
+        item["trace_reference"] = None
+        item["closure_contract_version"] = CLOSURE_CONTRACT_VERSION
 
         if item.get("category") == "duplicate_id_registry":
             dup_id = item.get("detail")
             if dup_id in duplicate_overlay_ids:
                 item["resolution_status"] = "resolved_via_overlay"
+                item["resolution_source"] = "overlay"
                 item["overlay_source"] = source
                 item["overlay_rule_type"] = "mapping:duplicate_id"
+                item["trace_reference"] = "mapping:duplicate_id"
 
         elif item.get("category") == "unresolved_parent":
             child = item.get("doc_id")
             original_parent = item.get("detail")
             if (child, original_parent) in parent_override_index:
                 item["resolution_status"] = "resolved_via_overlay"
+                item["resolution_source"] = "overlay"
                 item["overlay_source"] = source
                 item["overlay_rule_type"] = "parent_override"
+                item["trace_reference"] = "parent_override"
 
         if item["resolution_status"] == "resolved_via_overlay":
             resolved += 1
@@ -248,6 +257,30 @@ def apply_overlay_resolution_markers(
             unresolved += 1
 
     return resolved, unresolved
+
+
+def apply_candidate_successor_markers(
+    canonical_violations: list[dict], successor_by_replaces: dict[str, list[dict[str, str]]]
+) -> None:
+    """
+    T06 bridge marker only:
+    annotate candidate successor closure for selected categories without changing severity.
+    """
+    for item in canonical_violations:
+        if item.get("resolution_status") != "none":
+            continue
+        if item.get("category") not in {"noncanonical_doc_type_key", "invalid_replaces_format"}:
+            continue
+        src_id = item.get("doc_id")
+        if not src_id:
+            continue
+        candidates = successor_by_replaces.get(str(src_id), [])
+        if not candidates:
+            continue
+        chosen = candidates[0]
+        item["resolution_status"] = "candidate_successor"
+        item["resolution_source"] = "successor"
+        item["trace_reference"] = chosen.get("id")
 
 
 def parse_metadata(content: str) -> dict[str, str] | None:
@@ -387,6 +420,7 @@ def main() -> int:
 
     canonical_violations: list[dict] = []
     legacy_findings: list[dict] = []
+    successor_by_replaces: dict[str, list[dict[str, str]]] = {}
 
     for path in targets:
         rel = path.relative_to(ROOT)
@@ -469,12 +503,14 @@ def main() -> int:
         assert meta is not None
         doc_id = meta["ID"]
         doc_type_val = meta.get("Doc type") or meta.get("Type")
+        has_canonical_doc_type_key = "Doc type" in meta and "Type" not in meta
         if "Type" in meta and "Doc type" not in meta:
             canonical_violations.append(
                 {
                     "mode": "canonical",
                     "category": "noncanonical_doc_type_key",
                     "file": str(rel),
+                    "doc_id": doc_id,
                     "detail": "Uses Type: instead of Doc type:",
                 }
             )
@@ -563,6 +599,7 @@ def main() -> int:
                         "mode": "canonical",
                         "category": "invalid_replaces_format",
                         "file": str(rel),
+                        "doc_id": doc_id,
                         "detail": rs,
                     }
                 )
@@ -573,6 +610,20 @@ def main() -> int:
                         "category": "unresolved_replaces",
                         "file": str(rel),
                         "detail": rs,
+                    }
+                )
+
+            # Successor index (T06 bridge): canonical Doc type key + valid Replaces format.
+            if (
+                has_canonical_doc_type_key
+                and fdt is not None
+                and doc_type_val == fdt
+                and STRICT_ID_RE.match(rs)
+            ):
+                successor_by_replaces.setdefault(rs, []).append(
+                    {
+                        "id": doc_id,
+                        "file": str(rel),
                     }
                 )
 
@@ -603,6 +654,7 @@ def main() -> int:
     resolved_count, unresolved_count = apply_overlay_resolution_markers(
         canonical_violations, overlay
     )
+    apply_candidate_successor_markers(canonical_violations, successor_by_replaces)
 
     for item in canonical_violations:
         _attach_source_zone(item, path_zones)
@@ -630,6 +682,7 @@ def main() -> int:
             "canonical_unresolved_violations": unresolved_count,
             "cross_zone_violations": len(cross_zone_violations),
         },
+        "closure_contract_version": CLOSURE_CONTRACT_VERSION,
         "dual_mode": {
             "boundary_commit": BOUNDARY_COMMIT,
             "boundary_file": BOUNDARY_FILE_POSIX,
