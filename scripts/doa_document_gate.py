@@ -23,6 +23,12 @@ closure_semantics_enabled = True
 M1_SUCCESSOR_ACTIVATION_CATEGORIES = frozenset(
     {"noncanonical_doc_type_key", "invalid_replaces_format"}
 )
+SNAPSHOT_CATEGORY_SEVERITY_OVERRIDES = {
+    "snapshot_missing_required_metadata": "error",
+    "snapshot_invalid_id_format": "error",
+    "snapshot_status_not_accepted": "error",
+    "snapshot_future_artifact_reference": "error",
+}
 
 
 def run_validator(root_path: str | Path) -> dict[str, Any]:
@@ -157,6 +163,8 @@ def assign_severity(finding: dict[str, Any], policy: dict[str, Any] | None) -> s
     cat = finding.get("type") or ""
     if cat == "controlled_reference_to_legacy":
         return "error"
+    if cat in SNAPSHOT_CATEGORY_SEVERITY_OVERRIDES:
+        return SNAPSHOT_CATEGORY_SEVERITY_OVERRIDES[cat]
 
     pol = policy or {}
     overrides = pol.get("category_overrides") or {}

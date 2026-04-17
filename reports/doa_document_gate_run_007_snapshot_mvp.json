@@ -1,0 +1,1396 @@
+{
+  "schema": "doa-gate-report/1+dual_mode_mvp",
+  "generated_at_utc": "2026-04-17T09:25:41Z",
+  "repo_root": "D:\\Work\\DocOp\\Project",
+  "closure_contract_version": "closure/1",
+  "gate_status": "REJECT",
+  "gate_status_controlled": "ACCEPT",
+  "engine_version": "0.2.0",
+  "policy_version": "doa-gate-policy/1",
+  "counts": {
+    "total": 63,
+    "error": 14,
+    "warn": 45,
+    "info": 4
+  },
+  "dual_mode_counts": {
+    "legacy_findings_count": 61,
+    "controlled_findings_count": 0,
+    "cross_zone_violations_count": 0,
+    "other_zone_findings_count": 2
+  },
+  "findings": [
+    {
+      "type": "unresolved_parent",
+      "severity": "error",
+      "file": "docs\\architecture_draft\\DOA-ARCH-003_TZ_final_consolidated.md",
+      "details": "DOA-DOC-IDEA",
+      "engine_mode": "canonical",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "noncanonical_doc_type_key",
+      "severity": "info",
+      "file": "docs\\decision_log\\DOA-DEC-027_tz_import_conflict_resolution.md",
+      "details": "Uses Type: instead of Doc type:",
+      "engine_mode": "canonical",
+      "resolution_status": "resolved_via_successor_activation",
+      "resolution_source": "successor",
+      "trace_reference": "DOA-DEC-050",
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "status_not_in_enum",
+      "severity": "error",
+      "file": "docs\\decision_log\\DOA-DEC-027_tz_import_conflict_resolution.md",
+      "details": "approved",
+      "engine_mode": "canonical",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "missing_parent_field",
+      "severity": "error",
+      "file": "docs\\decision_log\\DOA-DEC-027_tz_import_conflict_resolution.md",
+      "details": null,
+      "engine_mode": "canonical",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "unresolved_parent",
+      "severity": "info",
+      "file": "docs\\idea_to_mvp\\DOA-IDEA-002_docops_document_gate.md",
+      "details": "DOA-OP-007",
+      "engine_mode": "canonical",
+      "resolution_status": "resolved_via_overlay",
+      "resolution_source": "overlay",
+      "trace_reference": "parent_override",
+      "closure_contract_version": "closure/1",
+      "overlay_source": "docs\\rules\\overlay_registry.json",
+      "overlay_rule_type": "parent_override",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "status_not_in_enum",
+      "severity": "error",
+      "file": "docs\\implementation_snapshot\\DOA-IMP-018_report_generator_mvp_t01_t03.md",
+      "details": "recorded",
+      "engine_mode": "canonical",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "status_not_in_enum",
+      "severity": "error",
+      "file": "docs\\implementation_snapshot\\DOA-IMP-019_report_generator_mvp_t04_t07.md",
+      "details": "recorded",
+      "engine_mode": "canonical",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "status_not_in_enum",
+      "severity": "error",
+      "file": "docs\\implementation_snapshot\\DOA-IMP-020_report_generator_human_readable_layer.md",
+      "details": "recorded",
+      "engine_mode": "canonical",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "status_not_in_enum",
+      "severity": "error",
+      "file": "docs\\implementation_snapshot\\DOA-IMP-021_report_generator_full_ru_static_strings.md",
+      "details": "recorded",
+      "engine_mode": "canonical",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "status_not_in_enum",
+      "severity": "error",
+      "file": "docs\\implementation_snapshot\\DOA-IMP-022_full_system_snapshot.md",
+      "details": "recorded",
+      "engine_mode": "canonical",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "invalid_replaces_format",
+      "severity": "info",
+      "file": "docs\\operational_plan\\DOA-OP-001_v2_mvp_implementation_bootstrap.md",
+      "details": "DOA-OP-001 (draft)",
+      "engine_mode": "canonical",
+      "resolution_status": "resolved_via_successor_activation",
+      "resolution_source": "successor",
+      "trace_reference": "DOA-OP-030",
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "status_not_in_enum",
+      "severity": "error",
+      "file": "docs\\operational_plan\\DOA-OP-021_report_generator_mvp.md",
+      "details": "planned",
+      "engine_mode": "canonical",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "status_not_in_enum",
+      "severity": "error",
+      "file": "docs\\operational_plan\\DOA-OP-022_document_system_hardening_cycle.md",
+      "details": "planned",
+      "engine_mode": "canonical",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "status_not_in_enum",
+      "severity": "error",
+      "file": "docs\\operational_plan\\DOA-OP-023_overlay_registry_mvp_implementation.md",
+      "details": "planned",
+      "engine_mode": "canonical",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "status_not_in_enum",
+      "severity": "error",
+      "file": "docs\\operational_plan\\DOA-OP-024_human_readable_report_generator_layer.md",
+      "details": "planned",
+      "engine_mode": "canonical",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "status_not_in_enum",
+      "severity": "error",
+      "file": "docs\\operational_plan\\DOA-OP-025_full_ru_report_static_strings.md",
+      "details": "planned",
+      "engine_mode": "canonical",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "duplicate_id_registry",
+      "severity": "info",
+      "file": "docs\\implementation_snapshot\\DOA-IMP-014_validator_hardening_baseline_pre_impl.md; docs\\implementation_snapshot\\DOA-IMP-014_validator_v02_planning_baseline.md",
+      "details": "DOA-IMP-014; files: docs\\implementation_snapshot\\DOA-IMP-014_validator_hardening_baseline_pre_impl.md, docs\\implementation_snapshot\\DOA-IMP-014_validator_v02_planning_baseline.md",
+      "engine_mode": "canonical",
+      "resolution_status": "resolved_via_overlay",
+      "resolution_source": "overlay",
+      "trace_reference": "mapping:duplicate_id",
+      "closure_contract_version": "closure/1",
+      "overlay_source": "docs\\rules\\overlay_registry.json",
+      "overlay_rule_type": "mapping:duplicate_id",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "duplicate_id_registry",
+      "severity": "error",
+      "file": "docs\\operational_plan\\DOA-OP-021_document_gate_ui_mvp_implementation.md; docs\\operational_plan\\DOA-OP-021_report_generator_mvp.md",
+      "details": "DOA-OP-021; files: docs\\operational_plan\\DOA-OP-021_document_gate_ui_mvp_implementation.md, docs\\operational_plan\\DOA-OP-021_report_generator_mvp.md",
+      "engine_mode": "canonical",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\architecture_draft\\DOA-ARCH-001_full_TZ.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\architecture_draft\\DOA-ARCH-002_TZ_structure.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\decision_log\\DOA-DEC-003_full_TZ_strategy.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\decision_log\\DOA-DEC-004.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\decision_log\\DOA-DEC-005.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\decision_log\\DOA-DEC-006.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\decision_log\\DOA-DEC-007.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\decision_log\\DOA-DEC-008.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\decision_log\\DOA-DEC-009.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\decision_log\\DOA-DEC-010.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\decision_log\\DOA-DEC-011.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\decision_log\\DOA-DEC-012.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\decision_log\\DOA-DEC-013.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\decision_log\\DOA-DEC-014.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\decision_log\\DOA-DEC-015.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\decision_log\\DOA-DEC-016.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\decision_log\\DOA-DEC-017.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\decision_log\\DOA-DEC-018.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\decision_log\\DOA-DEC-019.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\decision_log\\DOA-DEC-020.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\decision_log\\DOA-DEC-021.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\decision_log\\DOA-DEC-022.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\decision_log\\DOA-DEC-023.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\decision_log\\DOA-DEC-024.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\decision_log\\DOA-DEC-026_document_placement_policy.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\decision_log\\DOA-DEC-028_publish_and_external_audit.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\decision_log\\DOA-DEC-029_add_readme.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\decision_log\\DOA-DEC-030_add_other_and_rules_doc_types.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\implementation_snapshot\\DOA-IMP-001.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\implementation_snapshot\\DOA-IMP-002.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\implementation_snapshot\\DOA-IMP-003.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\implementation_snapshot\\DOA-IMP-004.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\implementation_snapshot\\DOA-IMP-005.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\implementation_snapshot\\DOA-IMP-006.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\implementation_snapshot\\DOA-IMP-007.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\implementation_snapshot\\DOA-IMP-008.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\implementation_snapshot\\DOA-OP-017.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\operational_plan\\DOA-OP-011.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\operational_plan\\DOA-OP-012.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\operational_plan\\DOA-OP-013.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\operational_plan\\DOA-OP-014.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\operational_plan\\DOA-OP-015.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "legacy_no_canonical_metadata",
+      "severity": "warn",
+      "file": "docs\\operational_plan\\DOA-OP-016.md",
+      "details": "No ## Metadata with strict ID field",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "legacy"
+    },
+    {
+      "type": "root_markdown_outside_docs_model",
+      "severity": "warn",
+      "file": "README.md",
+      "details": "README/WORKFLOW not required to carry ## Metadata",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "root"
+    },
+    {
+      "type": "root_markdown_outside_docs_model",
+      "severity": "warn",
+      "file": "WORKFLOW.md",
+      "details": "README/WORKFLOW not required to carry ## Metadata",
+      "engine_mode": "legacy",
+      "resolution_status": "none",
+      "resolution_source": "none",
+      "trace_reference": null,
+      "closure_contract_version": "closure/1",
+      "source_zone": "root"
+    }
+  ],
+  "gate_run": {
+    "dry_run": true,
+    "autofix": false,
+    "policy_path": null,
+    "policy_loaded": false
+  },
+  "raw": {
+    "engine_report": {
+      "validator": {
+        "name": "doa_link_id_validator",
+        "version": "0.2.0",
+        "schema": "doa-validator-report/1"
+      },
+      "generated_at_utc": "2026-04-17T09:25:41Z",
+      "root": "D:\\Work\\DocOp\\Project",
+      "scope": {
+        "globs": [
+          "docs/**/*.md",
+          "README.md",
+          "WORKFLOW.md"
+        ],
+        "files_scanned": 162
+      },
+      "counts": {
+        "canonical_violations": 18,
+        "legacy_findings": 45,
+        "canonical_resolved_via_overlay": 2,
+        "canonical_unresolved_violations": 16,
+        "cross_zone_violations": 0
+      },
+      "closure_contract_version": "closure/1",
+      "dual_mode": {
+        "boundary_commit": "d94a7d7b9751309ffbd55dd71614e25071c08c8a",
+        "boundary_file": "docs/fixed_snapshot/DOA-FSN-001_boundary_pre_controlled_phase.md",
+        "docs_path_zone_counts": {
+          "legacy": 128,
+          "controlled": 31,
+          "boundary": 1
+        },
+        "note": "Zones from Git first-commit vs boundary (DOA-DEC-047). Authoritative runs require full Git history (non-shallow clone)."
+      },
+      "cross_zone_violations": [],
+      "canonical_violations": [
+        {
+          "mode": "canonical",
+          "category": "unresolved_parent",
+          "file": "docs\\architecture_draft\\DOA-ARCH-003_TZ_final_consolidated.md",
+          "doc_id": "DOA-ARCH-003",
+          "detail": "DOA-DOC-IDEA",
+          "resolution_status": "none",
+          "resolution_source": "none",
+          "trace_reference": null,
+          "closure_contract_version": "closure/1",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "canonical",
+          "category": "noncanonical_doc_type_key",
+          "file": "docs\\decision_log\\DOA-DEC-027_tz_import_conflict_resolution.md",
+          "doc_id": "DOA-DEC-027",
+          "detail": "Uses Type: instead of Doc type:",
+          "resolution_status": "candidate_successor",
+          "resolution_source": "successor",
+          "trace_reference": "DOA-DEC-050",
+          "closure_contract_version": "closure/1",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "canonical",
+          "category": "status_not_in_enum",
+          "file": "docs\\decision_log\\DOA-DEC-027_tz_import_conflict_resolution.md",
+          "detail": "approved",
+          "resolution_status": "none",
+          "resolution_source": "none",
+          "trace_reference": null,
+          "closure_contract_version": "closure/1",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "canonical",
+          "category": "missing_parent_field",
+          "file": "docs\\decision_log\\DOA-DEC-027_tz_import_conflict_resolution.md",
+          "resolution_status": "none",
+          "resolution_source": "none",
+          "trace_reference": null,
+          "closure_contract_version": "closure/1",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "canonical",
+          "category": "unresolved_parent",
+          "file": "docs\\idea_to_mvp\\DOA-IDEA-002_docops_document_gate.md",
+          "doc_id": "DOA-IDEA-002",
+          "detail": "DOA-OP-007",
+          "resolution_status": "resolved_via_overlay",
+          "resolution_source": "overlay",
+          "trace_reference": "parent_override",
+          "closure_contract_version": "closure/1",
+          "overlay_source": "docs\\rules\\overlay_registry.json",
+          "overlay_rule_type": "parent_override",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "canonical",
+          "category": "status_not_in_enum",
+          "file": "docs\\implementation_snapshot\\DOA-IMP-018_report_generator_mvp_t01_t03.md",
+          "detail": "recorded",
+          "resolution_status": "none",
+          "resolution_source": "none",
+          "trace_reference": null,
+          "closure_contract_version": "closure/1",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "canonical",
+          "category": "status_not_in_enum",
+          "file": "docs\\implementation_snapshot\\DOA-IMP-019_report_generator_mvp_t04_t07.md",
+          "detail": "recorded",
+          "resolution_status": "none",
+          "resolution_source": "none",
+          "trace_reference": null,
+          "closure_contract_version": "closure/1",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "canonical",
+          "category": "status_not_in_enum",
+          "file": "docs\\implementation_snapshot\\DOA-IMP-020_report_generator_human_readable_layer.md",
+          "detail": "recorded",
+          "resolution_status": "none",
+          "resolution_source": "none",
+          "trace_reference": null,
+          "closure_contract_version": "closure/1",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "canonical",
+          "category": "status_not_in_enum",
+          "file": "docs\\implementation_snapshot\\DOA-IMP-021_report_generator_full_ru_static_strings.md",
+          "detail": "recorded",
+          "resolution_status": "none",
+          "resolution_source": "none",
+          "trace_reference": null,
+          "closure_contract_version": "closure/1",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "canonical",
+          "category": "status_not_in_enum",
+          "file": "docs\\implementation_snapshot\\DOA-IMP-022_full_system_snapshot.md",
+          "detail": "recorded",
+          "resolution_status": "none",
+          "resolution_source": "none",
+          "trace_reference": null,
+          "closure_contract_version": "closure/1",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "canonical",
+          "category": "invalid_replaces_format",
+          "file": "docs\\operational_plan\\DOA-OP-001_v2_mvp_implementation_bootstrap.md",
+          "doc_id": "DOA-OP-001",
+          "detail": "DOA-OP-001 (draft)",
+          "resolution_status": "candidate_successor",
+          "resolution_source": "successor",
+          "trace_reference": "DOA-OP-030",
+          "closure_contract_version": "closure/1",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "canonical",
+          "category": "status_not_in_enum",
+          "file": "docs\\operational_plan\\DOA-OP-021_report_generator_mvp.md",
+          "detail": "planned",
+          "resolution_status": "none",
+          "resolution_source": "none",
+          "trace_reference": null,
+          "closure_contract_version": "closure/1",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "canonical",
+          "category": "status_not_in_enum",
+          "file": "docs\\operational_plan\\DOA-OP-022_document_system_hardening_cycle.md",
+          "detail": "planned",
+          "resolution_status": "none",
+          "resolution_source": "none",
+          "trace_reference": null,
+          "closure_contract_version": "closure/1",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "canonical",
+          "category": "status_not_in_enum",
+          "file": "docs\\operational_plan\\DOA-OP-023_overlay_registry_mvp_implementation.md",
+          "detail": "planned",
+          "resolution_status": "none",
+          "resolution_source": "none",
+          "trace_reference": null,
+          "closure_contract_version": "closure/1",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "canonical",
+          "category": "status_not_in_enum",
+          "file": "docs\\operational_plan\\DOA-OP-024_human_readable_report_generator_layer.md",
+          "detail": "planned",
+          "resolution_status": "none",
+          "resolution_source": "none",
+          "trace_reference": null,
+          "closure_contract_version": "closure/1",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "canonical",
+          "category": "status_not_in_enum",
+          "file": "docs\\operational_plan\\DOA-OP-025_full_ru_report_static_strings.md",
+          "detail": "planned",
+          "resolution_status": "none",
+          "resolution_source": "none",
+          "trace_reference": null,
+          "closure_contract_version": "closure/1",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "canonical",
+          "category": "duplicate_id_registry",
+          "detail": "DOA-IMP-014",
+          "files": [
+            "docs\\implementation_snapshot\\DOA-IMP-014_validator_hardening_baseline_pre_impl.md",
+            "docs\\implementation_snapshot\\DOA-IMP-014_validator_v02_planning_baseline.md"
+          ],
+          "resolution_status": "resolved_via_overlay",
+          "resolution_source": "overlay",
+          "trace_reference": "mapping:duplicate_id",
+          "closure_contract_version": "closure/1",
+          "overlay_source": "docs\\rules\\overlay_registry.json",
+          "overlay_rule_type": "mapping:duplicate_id",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "canonical",
+          "category": "duplicate_id_registry",
+          "detail": "DOA-OP-021",
+          "files": [
+            "docs\\operational_plan\\DOA-OP-021_document_gate_ui_mvp_implementation.md",
+            "docs\\operational_plan\\DOA-OP-021_report_generator_mvp.md"
+          ],
+          "resolution_status": "none",
+          "resolution_source": "none",
+          "trace_reference": null,
+          "closure_contract_version": "closure/1",
+          "source_zone": "legacy"
+        }
+      ],
+      "legacy_findings": [
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\architecture_draft\\DOA-ARCH-001_full_TZ.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\architecture_draft\\DOA-ARCH-002_TZ_structure.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\decision_log\\DOA-DEC-003_full_TZ_strategy.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\decision_log\\DOA-DEC-004.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\decision_log\\DOA-DEC-005.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\decision_log\\DOA-DEC-006.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\decision_log\\DOA-DEC-007.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\decision_log\\DOA-DEC-008.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\decision_log\\DOA-DEC-009.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\decision_log\\DOA-DEC-010.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\decision_log\\DOA-DEC-011.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\decision_log\\DOA-DEC-012.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\decision_log\\DOA-DEC-013.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\decision_log\\DOA-DEC-014.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\decision_log\\DOA-DEC-015.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\decision_log\\DOA-DEC-016.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\decision_log\\DOA-DEC-017.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\decision_log\\DOA-DEC-018.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\decision_log\\DOA-DEC-019.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\decision_log\\DOA-DEC-020.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\decision_log\\DOA-DEC-021.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\decision_log\\DOA-DEC-022.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\decision_log\\DOA-DEC-023.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\decision_log\\DOA-DEC-024.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\decision_log\\DOA-DEC-026_document_placement_policy.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\decision_log\\DOA-DEC-028_publish_and_external_audit.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\decision_log\\DOA-DEC-029_add_readme.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\decision_log\\DOA-DEC-030_add_other_and_rules_doc_types.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\implementation_snapshot\\DOA-IMP-001.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\implementation_snapshot\\DOA-IMP-002.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\implementation_snapshot\\DOA-IMP-003.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\implementation_snapshot\\DOA-IMP-004.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\implementation_snapshot\\DOA-IMP-005.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\implementation_snapshot\\DOA-IMP-006.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\implementation_snapshot\\DOA-IMP-007.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\implementation_snapshot\\DOA-IMP-008.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\implementation_snapshot\\DOA-OP-017.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\operational_plan\\DOA-OP-011.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\operational_plan\\DOA-OP-012.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\operational_plan\\DOA-OP-013.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\operational_plan\\DOA-OP-014.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\operational_plan\\DOA-OP-015.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "legacy_no_canonical_metadata",
+          "file": "docs\\operational_plan\\DOA-OP-016.md",
+          "detail": "No ## Metadata with strict ID field",
+          "source_zone": "legacy"
+        },
+        {
+          "mode": "legacy",
+          "category": "root_markdown_outside_docs_model",
+          "file": "README.md",
+          "detail": "README/WORKFLOW not required to carry ## Metadata",
+          "source_zone": "root"
+        },
+        {
+          "mode": "legacy",
+          "category": "root_markdown_outside_docs_model",
+          "file": "WORKFLOW.md",
+          "detail": "README/WORKFLOW not required to carry ## Metadata",
+          "source_zone": "root"
+        }
+      ],
+      "overlay": {
+        "loaded": true,
+        "source": "docs\\rules\\overlay_registry.json"
+      },
+      "top_categories": [
+        {
+          "category": "legacy_no_canonical_metadata",
+          "count": 43
+        },
+        {
+          "category": "status_not_in_enum",
+          "count": 11
+        },
+        {
+          "category": "unresolved_parent",
+          "count": 2
+        },
+        {
+          "category": "duplicate_id_registry",
+          "count": 2
+        },
+        {
+          "category": "root_markdown_outside_docs_model",
+          "count": 2
+        },
+        {
+          "category": "noncanonical_doc_type_key",
+          "count": 1
+        },
+        {
+          "category": "missing_parent_field",
+          "count": 1
+        },
+        {
+          "category": "invalid_replaces_format",
+          "count": 1
+        }
+      ]
+    }
+  }
+}

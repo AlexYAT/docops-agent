@@ -41,6 +41,8 @@ FAMILY_TO_DOC_TYPE = {
 }
 
 STATUS_ENUM = frozenset({"draft", "review", "accepted", "obsolete"})
+SNAPSHOT_ID_RE = re.compile(r"^DOA-FSN-\d{3}$")
+SNAPSHOT_REQUIRED_METADATA = ("Project", "Doc type", "ID", "Status", "Date", "Parent")
 
 
 def _git_first_commit_introducing(root: Path, rel_posix: str) -> str | None:
@@ -384,6 +386,29 @@ def check_links(path: Path, content: str, issues: list[dict]) -> None:
             )
 
 
+def collect_internal_docs_links(root: Path, source_path: Path, content: str) -> list[str]:
+    """Collect docs-relative markdown link targets from source markdown."""
+    targets: list[str] = []
+    rel_parent = source_path.parent
+    for _text, target in LINK_RE.findall(content):
+        target = target.strip()
+        if target.startswith(("http://", "https://", "mailto:", "#")):
+            continue
+        if "://" in target:
+            continue
+        clean = target.split("#", 1)[0]
+        if not clean:
+            continue
+        cand = (rel_parent / clean).resolve()
+        try:
+            trel = cand.relative_to(root.resolve()).as_posix()
+        except ValueError:
+            continue
+        if cand.is_file() and trel.startswith("docs/") and trel.endswith(".md"):
+            targets.append(trel)
+    return targets
+
+
 def main() -> int:
     targets = collect_targets(ROOT)
     overlay = load_overlay_registry(OVERLAY_REGISTRY_PATH)
@@ -567,6 +592,60 @@ def main() -> int:
                     "detail": st,
                 }
             )
+
+        if doc_type_val == "fixed_snapshot":
+            missing_required = [k for k in SNAPSHOT_REQUIRED_METADATA if not meta.get(k)]
+            for k in missing_required:
+                canonical_violations.append(
+                    {
+                        "mode": "canonical",
+                        "category": "snapshot_missing_required_metadata",
+                        "severity": "error",
+                        "file": str(rel),
+                        "doc_id": doc_id,
+                        "detail": k,
+                    }
+                )
+
+            if not SNAPSHOT_ID_RE.match(doc_id):
+                canonical_violations.append(
+                    {
+                        "mode": "canonical",
+                        "category": "snapshot_invalid_id_format",
+                        "severity": "error",
+                        "file": str(rel),
+                        "doc_id": doc_id,
+                        "detail": doc_id,
+                    }
+                )
+
+            if st and st != "accepted":
+                canonical_violations.append(
+                    {
+                        "mode": "canonical",
+                        "category": "snapshot_status_not_accepted",
+                        "severity": "error",
+                        "file": str(rel),
+                        "doc_id": doc_id,
+                        "detail": st,
+                    }
+                )
+
+            for trel in collect_internal_docs_links(ROOT, path, text):
+                target_zone = path_zones.get(trel, "unknown")
+                if target_zone == "controlled":
+                    canonical_violations.append(
+                        {
+                            "mode": "canonical",
+                            "category": "snapshot_future_artifact_reference",
+                            "severity": "error",
+                            "file": str(rel),
+                            "doc_id": doc_id,
+                            "target": trel,
+                            "detail": f"snapshot links to controlled target {trel}",
+                            "target_zone": "controlled",
+                        }
+                    )
 
         parent = meta.get("Parent")
         if parent is None:
