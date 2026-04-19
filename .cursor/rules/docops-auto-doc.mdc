@@ -31,6 +31,14 @@ alwaysApply: true
 Каждый документ должен иметь корректный metadata-блок,
 ID, doc_type и parent (parent может быть null).
 
+6. doc_type vs status (DOA-DEC-060, DOA-ARCH-026)
+- **doc_type** — имя **класса артефакта** (стабильный идентификатор типа). Пиши и копируй **как есть**, без переименований и «улучшений».
+- **status** — ось **зрелости/состояния** конкретного файла.
+- Подстрока **draft** внутри **doc_type** (например `architecture_draft`) — часть **имени класса**, а **не** синоним `Status: draft` и **не** основание выводить зрелость без поля **Status**.
+- Сочетания вроде **`architecture_draft` + `Status: accepted`** допустимы.
+- Канонический путь: **`docs/<doc_type>/`** (см. размещение ниже); путь **не** выбирай по «смыслу» слов внутри имени типа.
+- Semantic cleanup, переименование **doc_type**, каталогов и миграции — **только** при отдельном lifecycle и **decision_log**, не в рамках произвольного hardening без DEC.
+
 ---
 
 ## Canonical storage
@@ -78,9 +86,11 @@ ID, doc_type и parent (parent может быть null).
 - Project: DOA
 - Doc type: <doc_type>
 - ID: <ID>
-- Status: draft
+- Status: <draft | review | accepted | obsolete>
 - Date: YYYY-MM-DD
 - Parent: null
+
+Пример для нового документа по умолчанию: `Status: draft`. Значение **Status** задаёт зрелость; оно **независимо** от буквального состава **doc_type** (см. § doc_type vs status выше).
 
 Дополнительно допустимы:
 - Replaces: <ID>
@@ -89,6 +99,7 @@ ID, doc_type и parent (parent может быть null).
 Правила:
 - Parent обязателен как поле, но может быть null
 - ID должен быть уникален
+- **Doc type** — ровно один из поддерживаемых slug’ов; не подменяй на «удобные» имена.
 - Status допустим только:
   - draft
   - review
@@ -121,12 +132,14 @@ ID, doc_type и parent (parent может быть null).
 ## Status policy
 
 По умолчанию:
-- новый документ → draft
+- новый документ → `Status: draft` (это поле metadata, не «намёк» из **doc_type**)
 
 Accepted использовать только когда документ действительно утверждён.
 Obsolete использовать только для заменённых версий.
 
 Не меняй статус старого документа без явной причины.
+
+Не путай **зрелость** (Status) с именем класса (**doc_type**): наличие слова draft в **doc_type** не задаёт Status автоматически.
 
 ---
 

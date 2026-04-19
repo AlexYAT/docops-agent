@@ -28,10 +28,23 @@
 
 ## File Placement
 
+Canonical path: `docs/<doc_type>/` — use the **exact** `doc_type` slug from metadata (no renames or “cleanups”).
+
+- idea_to_mvp -> docs/idea_to_mvp/
+- architecture_draft -> docs/architecture_draft/
 - decision_log -> docs/decision_log/
 - operational_plan -> docs/operational_plan/
 - implementation_snapshot -> docs/implementation_snapshot/
-- architecture -> docs/architecture_draft/
+
+---
+
+## doc_type vs status (DOA-DEC-060, DOA-ARCH-026)
+
+- **doc_type** = class of artifact (copy **exactly**).
+- **status** = maturity/state (draft | review | accepted | obsolete).
+- Substring **draft** inside **doc_type** (e.g. `architecture_draft`) is **not** `Status: draft`.
+- Pairs like `architecture_draft` + **accepted** are valid.
+- No type renaming, folder migrations, or semantic cleanup **without** a separate lifecycle + **decision_log**.
 
 ---
 
