@@ -24,6 +24,7 @@ BOUNDARY_COMMIT = "d94a7d7b9751309ffbd55dd71614e25071c08c8a"
 BOUNDARY_FILE_POSIX = "docs/fixed_snapshot/DOA-FSN-001_boundary_pre_controlled_phase.md"
 
 STRICT_ID_RE = re.compile(r"^DOA-(IDEA|ARCH|DEC|LT|MT|OP|IMP|AUD|OTH|RUL|FSN)-(\d+)$")
+ENFORCEMENT_ID_RE = re.compile(r"^DOA-(IDEA|ARCH|DEC|LT|MT|OP|IMP|AUD|OTH|RUL|FSN)-\d{3}$")
 LINK_RE = re.compile(r"\[([^\]]*)\]\(([^)]+)\)")
 
 FAMILY_TO_DOC_TYPE = {
@@ -43,6 +44,20 @@ FAMILY_TO_DOC_TYPE = {
 STATUS_ENUM = frozenset({"draft", "review", "accepted", "obsolete"})
 SNAPSHOT_ID_RE = re.compile(r"^DOA-FSN-\d{3}$")
 SNAPSHOT_REQUIRED_METADATA = ("Project", "Doc type", "ID", "Status", "Date", "Parent")
+DOC_TYPE_TO_FOLDER = {
+    "idea_to_mvp": "docs/idea_to_mvp",
+    "architecture_draft": "docs/architecture_draft",
+    "decision_log": "docs/decision_log",
+    "implementation_snapshot": "docs/implementation_snapshot",
+    "audit_check": "docs/audit_check",
+    "longterm_plan": "docs/longterm_plan",
+    "midterm_plan": "docs/midterm_plan",
+    "operational_plan": "docs/operational_plan",
+    # Compatibility families used by existing validator/rules.
+    "other": "docs/other",
+    "rules": "docs/rules",
+    "fixed_snapshot": "docs/fixed_snapshot",
+}
 
 
 def _git_first_commit_introducing(root: Path, rel_posix: str) -> str | None:
@@ -314,6 +329,27 @@ def stem_base_id(name: str) -> str | None:
     return m.group(1) if m else None
 
 
+def extract_filename_id(stem: str) -> str | None:
+    m = re.match(r"^(DOA-(?:IDEA|ARCH|DEC|LT|MT|OP|IMP|AUD|OTH|RUL|FSN)-\d{3})(?:_|$)", stem)
+    return m.group(1) if m else None
+
+
+def expected_folder_for_doc_type(doc_type_val: str | None) -> str | None:
+    if not doc_type_val:
+        return None
+    return DOC_TYPE_TO_FOLDER.get(doc_type_val.strip())
+
+
+def is_valid_slug_suffix(stem: str, doc_id: str) -> bool:
+    expected_prefix = f"{doc_id}_"
+    if not stem.startswith(expected_prefix):
+        return False
+    slug = stem[len(expected_prefix) :]
+    if not slug:
+        return False
+    return bool(re.fullmatch(r"[a-z0-9]+(?:_[a-z0-9]+)*", slug))
+
+
 def legacy_header_id(content: str) -> str | None:
     for pat in (
         r"^#\s*Decision:\s*(DOA-DEC-\d+)",
@@ -445,6 +481,7 @@ def main() -> int:
 
     canonical_violations: list[dict] = []
     legacy_findings: list[dict] = []
+    enforcement_findings: list[dict] = []
     successor_by_replaces: dict[str, list[dict[str, str]]] = {}
 
     for path in targets:
@@ -528,6 +565,74 @@ def main() -> int:
         assert meta is not None
         doc_id = meta["ID"]
         doc_type_val = meta.get("Doc type") or meta.get("Type")
+        rel_posix = rel.as_posix()
+        actual_folder = str(rel.parent).replace("\\", "/")
+        expected_folder = expected_folder_for_doc_type(doc_type_val)
+
+        # T02: doc_type -> folder is a core deterministic invariant, therefore error severity.
+        if doc_type_val and expected_folder and actual_folder != expected_folder:
+            enforcement_findings.append(
+                {
+                    "type": "doc_type_folder_mismatch",
+                    "severity": "error",
+                    "path": rel_posix,
+                    "expected": expected_folder,
+                    "actual": actual_folder,
+                    "doc_type": doc_type_val,
+                }
+            )
+
+        # T03: enforce canonical ID family with 3-digit numeric suffix.
+        if not ENFORCEMENT_ID_RE.match(doc_id):
+            enforcement_findings.append(
+                {
+                    "type": "invalid_id_format",
+                    "severity": "error",
+                    "path": rel_posix,
+                    "expected": "DOA-[TYPE]-NNN",
+                    "actual": doc_id,
+                }
+            )
+
+        filename_id = extract_filename_id(path.stem)
+        if filename_id and filename_id != doc_id:
+            enforcement_findings.append(
+                {
+                    "type": "metadata_inconsistency",
+                    "severity": "error",
+                    "path": rel_posix,
+                    "expected": doc_id,
+                    "actual": filename_id,
+                    "field": "id_filename",
+                    "detail": "Metadata ID must match filename ID prefix",
+                }
+            )
+
+        if doc_type_val and expected_folder and actual_folder != expected_folder:
+            enforcement_findings.append(
+                {
+                    "type": "metadata_inconsistency",
+                    "severity": "error",
+                    "path": rel_posix,
+                    "expected": expected_folder,
+                    "actual": actual_folder,
+                    "field": "doc_type_folder",
+                    "detail": "Metadata Doc type must match canonical folder",
+                }
+            )
+
+        # T04: enforce <ID>_<short_lowercase_slug>.md naming convention.
+        if not is_valid_slug_suffix(path.stem, doc_id):
+            enforcement_findings.append(
+                {
+                    "type": "filename_mismatch",
+                    "severity": "error",
+                    "path": rel_posix,
+                    "expected": f"{doc_id}_<short_lowercase_slug>.md",
+                    "actual": f"{path.stem}.md",
+                }
+            )
+
         has_canonical_doc_type_key = "Doc type" in meta and "Type" not in meta
         if "Type" in meta and "Doc type" not in meta:
             canonical_violations.append(
@@ -760,6 +865,13 @@ def main() -> int:
             "canonical_resolved_via_overlay": resolved_count,
             "canonical_unresolved_violations": unresolved_count,
             "cross_zone_violations": len(cross_zone_violations),
+            "enforcement_findings_total": len(enforcement_findings),
+            "enforcement_errors": sum(
+                1 for item in enforcement_findings if item.get("severity") == "error"
+            ),
+            "enforcement_warnings": sum(
+                1 for item in enforcement_findings if item.get("severity") == "warning"
+            ),
         },
         "closure_contract_version": CLOSURE_CONTRACT_VERSION,
         "dual_mode": {
@@ -772,6 +884,7 @@ def main() -> int:
         "cross_zone_violations": cross_zone_violations,
         "canonical_violations": canonical_violations,
         "legacy_findings": legacy_findings,
+        "enforcement_findings": enforcement_findings,
         "overlay": {
             "loaded": overlay.get("loaded", False),
             "source": overlay.get("source", "docs/rules/overlay_registry.json"),
